@@ -1,0 +1,36 @@
+.page {
+  background: linear-gradient(rgba(196, 234, 239, 0.95), rgba(255, 255, 255, 0.98));
+  display: grid;
+  place-items: center; 
+}
+.container {
+  width: 80%;
+  margin: 0px auto;
+}
+.img_header {
+  margin: 0px auto 20px;
+  border-radius: 10px;
+}
+.form_style {
+  margin-bottom: 100px;
+}
+.form_item {
+  margin: 15px 0;
+}
+.btn {
+  background-color: #13BED8;
+  border-radius: 100px;
+  color: #fff;
+}
+.btn:hover {
+  background-color: #067DB2 !important;
+  color: #fff !important;
+}
+
+@media (max-width: 600px) {
+  .container {
+    width: 90%;
+    margin: 0px auto;
+    
+  }
+}
