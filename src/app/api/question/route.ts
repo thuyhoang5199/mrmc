@@ -81,6 +81,7 @@ export async function GET() {
 export async function POST(req: NextRequest) {
   const cookie = (await cookies()).get("session")?.value;
   // const { username, password } = await req.json();
+  console.log(req);
   const account = validateAuthenticated({
     token: cookie as string,
   });

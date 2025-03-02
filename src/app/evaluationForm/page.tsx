@@ -254,7 +254,7 @@ export default function EvaluationForm() {
       });
   }, []);
 
-  const onFinish = (values: any) => {
+  const onFinish = (values: unknown) => {
     setIsLoading(true);
     fetch("/api/question", {
       method: "POST",
@@ -291,7 +291,9 @@ export default function EvaluationForm() {
   };
 
   // Recursively disable parent nodes that are not leaves
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const processTreeData = (data: any) => {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     return data.map((node: any) => {
       if (node.children) {
         return {
