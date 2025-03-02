@@ -1,231 +1,217 @@
-'use client';  // Add this line to make this a Client Component
+"use client"; // Add this line to make this a Client Component
 
-import React, { Fragment, useState } from 'react';
+import React, { Fragment, useEffect, useState } from "react";
 import styles from "./page.module.css";
-import { Button, Divider, Form, Input, Typography, Select, SliderSingleProps, Slider, TreeSelect, Radio, message, FloatButton, notification } from 'antd';
-import { Image } from 'antd';
-import type { TreeSelectProps, RadioChangeEvent } from 'antd';
-import { FileTextOutlined } from '@ant-design/icons';
-import { useRouter } from 'next/navigation';
-
+import {
+  Button,
+  Divider,
+  Form,
+  Input,
+  Typography,
+  Select,
+  SliderSingleProps,
+  Slider,
+  TreeSelect,
+  Radio,
+  message,
+  FloatButton,
+  notification,
+} from "antd";
+import { Image } from "antd";
+import { FileTextOutlined } from "@ant-design/icons";
+import { useRouter } from "next/navigation";
+import LoadingPage from "../component/LoadingPage";
 
 const { Option } = Select;
 
-const marksBenign: SliderSingleProps['marks'] = {
+const marksBenign: SliderSingleProps["marks"] = {
   1: {
     style: {
-      color: '#086f0f',
+      color: "#086f0f",
       width: "100px",
-      left: "5px"
+      left: "5px",
     },
-    label: <strong >High confidence Benign</strong>,
+    label: <strong>High confidence Benign</strong>,
   },
   50: {
     style: {
-      color: '#9c9006',
+      color: "#9c9006",
       right: "-10px",
       width: "100px",
     },
-    label: <strong >Low confidence Benign</strong>,
+    label: <strong>Low confidence Benign</strong>,
   },
 };
-const marksMalignant: SliderSingleProps['marks'] = {
+const marksMalignant: SliderSingleProps["marks"] = {
   51: {
     style: {
-      color: '#9c9006',
+      color: "#9c9006",
       width: "100px",
-      left: "5px"
+      left: "5px",
     },
-    label: <strong className={styles.note_slide}>Low confidence Malignant </strong>,
+    label: (
+      <strong className={styles.note_slide}>Low confidence Malignant </strong>
+    ),
   },
   100: {
     style: {
-      color: 'red',
+      color: "red",
       right: "-10px",
       width: "100px",
     },
-    label: <strong className={styles.note_slide}>High confidence Malignant </strong>,
+    label: (
+      <strong className={styles.note_slide}>High confidence Malignant </strong>
+    ),
   },
 };
 
 const benignLesions = [
   {
-    value: 'benign 1',
-    title: 'Seborrheic Keratosis (SK)',
+    value: "benign 1",
+    title: "Seborrheic Keratosis (SK)",
     children: [
       {
-        value: 'children 7',
-        title: 'children',
-
+        value: "children 7",
+        title: "children",
       },
-
     ],
   },
   {
-    value: 'benign 2',
-    title: 'Nevus',
+    value: "benign 2",
+    title: "Nevus",
     children: [
       {
-        value: 'children 2',
-        title: 'children',
-
+        value: "children 2",
+        title: "children",
       },
-
     ],
   },
   {
-    value: 'benign 3',
-    title: 'Dermatofibroma',
+    value: "benign 3",
+    title: "Dermatofibroma",
     children: [
       {
-        value: 'children 1',
-        title: 'children',
-
+        value: "children 1",
+        title: "children",
       },
-
     ],
   },
   {
-    value: 'benign 4',
-    title: 'Warts',
-
+    value: "benign 4",
+    title: "Warts",
   },
   {
-    value: 'benign 5',
-    title: 'Sebaceous Hyperplasia',
+    value: "benign 5",
+    title: "Sebaceous Hyperplasia",
   },
   {
-    value: 'benign 6',
-    title: ' Other benign lesions',
+    value: "benign 6",
+    title: " Other benign lesions",
   },
-
 ];
 const malignantLesions = [
   {
-    value: 'malignant1',
-    title: 'Melanoma',
+    value: "malignant1",
+    title: "Melanoma",
     children: [
       {
-        value: 'children 1',
-        title: 'Lentigo maligna',
-
+        value: "children 1",
+        title: "Lentigo maligna",
       },
       {
-        value: 'children 2',
-        title: 'Lentigo maligna melanoma',
-
+        value: "children 2",
+        title: "Lentigo maligna melanoma",
       },
       {
-        value: 'children 3',
-        title: 'Superficial spreading melanoma',
-
+        value: "children 3",
+        title: "Superficial spreading melanoma",
       },
       {
-        value: 'children 4',
-        title: 'Melanoma in situ',
-
+        value: "children 4",
+        title: "Melanoma in situ",
       },
       {
-        value: 'children 5',
-        title: 'Nodular',
-
+        value: "children 5",
+        title: "Nodular",
       },
       {
-        value: 'children 6',
-        title: 'Acral lentiginous melanoma',
-
+        value: "children 6",
+        title: "Acral lentiginous melanoma",
       },
       {
-        value: 'children 7',
-        title: 'NOS / Other type of MM',
-
+        value: "children 7",
+        title: "NOS / Other type of MM",
       },
-
     ],
-
   },
   {
-    value: 'malignant2',
-    title: 'Basal Cell Carcinoma (BCC)',
+    value: "malignant2",
+    title: "Basal Cell Carcinoma (BCC)",
     children: [
       {
-        value: 'children1',
-        title: 'Solid/nodular',
-
+        value: "children1",
+        title: "Solid/nodular",
       },
       {
-        value: 'children2',
-        title: 'Multicentric/superficial',
-
+        value: "children2",
+        title: "Multicentric/superficial",
       },
       {
-        value: 'children3',
-        title: 'Pigmented',
-
+        value: "children3",
+        title: "Pigmented",
       },
       {
-        value: 'children4',
-        title: 'Morpheaform, infiltrating',
-
+        value: "children4",
+        title: "Morpheaform, infiltrating",
       },
       {
-        value: 'children5',
-        title: 'Intraepidermal',
-
+        value: "children5",
+        title: "Intraepidermal",
       },
       {
-        value: 'children6',
-        title: 'Fibroepithelial',
-
+        value: "children6",
+        title: "Fibroepithelial",
       },
       {
-        value: 'children7',
-        title: 'Metatypical',
-
+        value: "children7",
+        title: "Metatypical",
       },
       {
-        value: 'children8',
-        title: 'Other Type of BCC',
-
+        value: "children8",
+        title: "Other Type of BCC",
       },
-
     ],
-
-  }, {
-    value: 'malignant3',
-    title: 'Squamous Cell Carcinoma (SCC)',
+  },
+  {
+    value: "malignant3",
+    title: "Squamous Cell Carcinoma (SCC)",
     children: [
       {
-        value: 'children11',
-        title: 'In situr',
-
+        value: "children11",
+        title: "In situr",
       },
       {
-        value: 'children22',
-        title: 'Invasive/keratinizing',
-
+        value: "children22",
+        title: "Invasive/keratinizing",
       },
       {
-        value: 'children33',
-        title: 'Metastatic',
-
+        value: "children33",
+        title: "Metastatic",
       },
       {
-        value: 'children44',
-        title: 'Other type of SCC',
-
+        value: "children44",
+        title: "Other type of SCC",
       },
     ],
-
-  }, {
-    value: 'malignant4',
-    title: 'Actinic Keratosis (AK)',
-
-  }, {
-    value: 'malignant5',
-    title: 'Other Malignant Lesions',
-
-  }
+  },
+  {
+    value: "malignant4",
+    title: "Actinic Keratosis (AK)",
+  },
+  {
+    value: "malignant5",
+    title: "Other Malignant Lesions",
+  },
 ];
 
 export default function EvaluationForm() {
@@ -233,37 +219,76 @@ export default function EvaluationForm() {
   const [form] = Form.useForm();
   const [messageApi, contextHolder] = message.useMessage();
   const [api, contextHolderNotificationSave] = notification.useNotification();
+  const [isLoading, setIsLoading] = useState(false);
+  const [questionInfo, setQuestionInfo] = useState({
+    nextQuestionIndex: 1,
+    patientAge: "0",
+    patientGender: "",
+    lesionLocation: "",
+    lesionSize: "",
+    lesionPicture: null,
+    lesionAuraResultScreen: null,
+    lesionId: null,
+    doctorName: "",
+  });
+  useEffect(() => {
+    setIsLoading(true);
+    fetch("/api/question")
+      .then(async (res: Response) => {
+        const data = await res.json();
+        if (data?.successAll) {
+          router.replace("/result");
+        }
+        setQuestionInfo(data);
+      })
+      .catch(async (e) => {
+        const data = await e.json();
 
-  const [valueBenign, setValueBenign] = useState<string>();
-  const [valueMalignant, setValueMalignant] = useState<string>();
-
-
+        api.error({
+          message: "Get Data Error",
+          description: data.message,
+        });
+      })
+      .finally(() => {
+        setIsLoading(false);
+      });
+  }, []);
 
   const onFinish = (values: any) => {
-    console.log(values);
-    router.push('/result');
+    setIsLoading(true);
+    fetch("/api/question", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(values),
+    })
+      .then(async (res: Response) => {
+        const data = await res.json();
+        if (data?.successAll) {
+          router.replace("/result");
+        }
+        setQuestionInfo(data);
+        form.resetFields();
+      })
+      .catch(async (e) => {
+        const data = await e.json();
+        api.success({
+          message: "Save error",
+          description: data.message,
+        });
+      })
+      .finally(() => {
+        setIsLoading(false);
+      });
   };
   const warning = (value: string) => {
     if (value) {
       messageApi.open({
-        type: 'warning',
-        content: 'IMPORTANT NOTE:  For the MRM Study, Actinic Keratosis (AK) is classified as a “malignant” diagnosis',
+        type: "warning",
+        content:
+          "IMPORTANT NOTE:  For the MRM Study, Actinic Keratosis (AK) is classified as a “malignant” diagnosis",
       });
     }
-
   };
-
-  const onChangeBenign = (newValue: string) => {
-    setValueBenign(newValue);
-  };
-  const onChangeMalignant = (newValue: string) => {
-    setValueMalignant(newValue);
-  };
-
-  const onPopupScroll: TreeSelectProps['onPopupScroll'] = (e) => {
-    console.log('onPopupScroll', e);
-  };
-
 
   // Recursively disable parent nodes that are not leaves
   const processTreeData = (data: any) => {
@@ -280,81 +305,110 @@ export default function EvaluationForm() {
   };
   const openNotificationWithIcon = () => {
     api.success({
-      message: 'Save Success',
-      description:
-        'Your evaluation process has been saved successfully.',
+      message: "Save Success",
+      description: "Your evaluation process has been saved successfully.",
     });
   };
+
+  if (isLoading) return <LoadingPage />;
   return (
     <div className={styles.page}>
       <div className={styles.container}>
-
         <Image
-          src="bg.png" preview={false}
+          alt="background"
+          src="bg.png"
+          preview={false}
           className={styles.img_header}
         />
         <Fragment>
           <Typography.Title level={3}>
-            MRMC Evaluation - Part 3 of 10
+            MRMC Evaluation - Part {questionInfo.nextQuestionIndex} of 160
           </Typography.Title>
           <Typography.Title level={5}>
-            Acc: Thuy hoang
+            Acc: {questionInfo.doctorName}
           </Typography.Title>
         </Fragment>
         <Divider />
         <Typography.Title level={4}>
           Please provide your diagnosis for the lesion shown below.
         </Typography.Title>
-        <Typography.Title level={5} className={styles.property}>Patient's Age:
-          <Input disabled className={styles.input_property} value="30" />
+        <Typography.Title level={5} className={styles.property}>
+          Patient&apos;s Age:
+          <Input
+            disabled
+            className={styles.input_property}
+            value={questionInfo.patientAge}
+          />
         </Typography.Title>
-        <Typography.Title level={5} className={styles.property}>Patient's Gender:
-          <Input disabled className={styles.input_property} value="Male" />
+        <Typography.Title level={5} className={styles.property}>
+          Patient&apos;s Gender:
+          <Input
+            disabled
+            className={styles.input_property}
+            value={questionInfo.patientGender}
+          />
         </Typography.Title>
-        <Typography.Title level={5} className={styles.property}>Location of the lesion:
-          <Input disabled className={styles.input_property} value="Face" />
+        <Typography.Title level={5} className={styles.property}>
+          Location of the lesion:
+          <Input
+            disabled
+            className={styles.input_property}
+            value={questionInfo.lesionLocation}
+          />
         </Typography.Title>
-        <Typography.Title level={5} className={styles.property}>Lesion size:
-          <Input disabled className={styles.input_property} value="5mm" />
+        <Typography.Title level={5} className={styles.property}>
+          Lesion size:
+          <Input
+            disabled
+            className={styles.input_property}
+            value={questionInfo.lesionSize}
+          />
         </Typography.Title>
 
-        <Form onFinish={onFinish} form={form} className={styles.form_style} >
+        <Form onFinish={onFinish} form={form} className={styles.form_style}>
           {contextHolder}
           {contextHolderNotificationSave}
 
           <Typography className={styles.img_gr}>
             <div className={styles.note_not_img}>
-              <span>Please do not zoom the lesion picture in or out.
+              <span>
+                Please do not zoom the lesion picture in or out.
                 <br />
-                The default web zoom setting is at 100%,<br /> please do not change it.</span>
+                The default web zoom setting is at 100%,
+                <br /> please do not change it.
+              </span>
             </div>
             {/* <Image
               src="523_003_Aura.jpg"
               className={styles.img}
             /> */}
-            <Image
-              src="523_003.jpg"
-              className={styles.img}
-            />
+            <Image src="523_003.jpg" className={styles.img} />
           </Typography>
 
-          <Form.Item name="choose" label="" rules={[{ required: true, message: "This field is required" }]} className={styles.form_item}>
+          <Form.Item
+            name="choose"
+            label=""
+            rules={[{ required: true, message: "This field is required" }]}
+            className={styles.form_item}
+          >
             <Select
               placeholder="Choose"
               allowClear
               onChange={warning}
               className={styles.select_style}
             >
-              <Option value="benign" >Benign</Option>
-              <Option value="malignant" >Malignant</Option>
+              <Option value="benign">Benign</Option>
+              <Option value="malignant">Malignant</Option>
             </Select>
           </Form.Item>
           <Form.Item
             noStyle
-            shouldUpdate={(prevValues, currentValues) => prevValues.choose !== currentValues.choose}
+            shouldUpdate={(prevValues, currentValues) =>
+              prevValues.choose !== currentValues.choose
+            }
           >
             {({ getFieldValue }) =>
-              getFieldValue('choose') === 'benign' ? (
+              getFieldValue("choose") === "benign" ? (
                 <>
                   <Form.Item
                     name="confidenceBenign"
@@ -363,87 +417,105 @@ export default function EvaluationForm() {
                     labelCol={{ span: 24 }}
                     wrapperCol={{ span: 24 }}
                   >
-                    <Slider marks={marksBenign} min={1} max={50} step={1} tooltip={{ open: true }} className={styles.slider_style} />
+                    <Slider
+                      marks={marksBenign}
+                      min={1}
+                      max={50}
+                      step={1}
+                      tooltip={{ open: true }}
+                      className={styles.slider_style}
+                    />
                   </Form.Item>
                   <Form.Item
                     name="lesionBenign"
                     label="Lesion 2 of 16: Benign Diagnosis - Lesion Type"
-                    rules={[{ required: true, message: "This field is required" }]}
+                    rules={[
+                      { required: true, message: "This field is required" },
+                    ]}
                     labelCol={{ span: 24 }}
                     wrapperCol={{ span: 24 }}
+                    valuePropName="select"
                   >
                     <TreeSelect
                       showSearch
-                      style={{ width: '100%' }}
-                      value={valueBenign}
-                      dropdownStyle={{ maxHeight: 400, overflow: 'auto' }}
+                      style={{ width: "100%" }}
+                      dropdownStyle={{ maxHeight: 400, overflow: "auto" }}
                       placeholder="Please select"
                       allowClear
-                      treeDefaultExpandAll
-                      onChange={onChangeBenign}
+                      // treeDefaultExpandAll
                       treeData={processTreeData(benignLesions)}
-                      onPopupScroll={onPopupScroll}
                     />
                   </Form.Item>
                 </>
+              ) : getFieldValue("choose") === "malignant" ? (
+                <>
+                  <Form.Item
+                    name="confidenceMalignant"
+                    label="Lesion 2 of 16: Malignant Diagnosis - Confidence Level"
+                    rules={[{ required: true, message: "" }]}
+                    labelCol={{ span: 24 }}
+                    wrapperCol={{ span: 24 }}
+                  >
+                    <Slider
+                      marks={marksMalignant}
+                      min={51}
+                      max={100}
+                      step={1}
+                      tooltip={{ open: true }}
+                      className={styles.slider_style}
+                    />
+                  </Form.Item>
+                  <Form.Item
+                    name="lesionMalignant"
+                    label="Lesion 2 of 16: Malignant Diagnosis - Lesion Type"
+                    rules={[
+                      { required: true, message: "This field is required" },
+                    ]}
+                    labelCol={{ span: 24 }}
+                    wrapperCol={{ span: 24 }}
+                    valuePropName="select"
+                  >
+                    <TreeSelect
+                      showSearch
+                      style={{ width: "100%" }}
+                      dropdownStyle={{ maxHeight: 400, overflow: "auto" }}
+                      placeholder="Please select"
+                      allowClear
+                      // treeDefaultExpandAll
+                      treeData={processTreeData(malignantLesions)}
+                    />
+                  </Form.Item>
+                  <Form.Item
+                    name="checkMalignant"
+                    label="Did the AURA Slider bar position affect your diagnostic decision?"
+                    rules={[
+                      { required: true, message: "This field is required" },
+                    ]}
+                    labelCol={{ span: 24 }}
+                    wrapperCol={{ span: 24 }}
+                  >
+                    <Radio.Group>
+                      <Radio value="yes">Yes</Radio>
+                      <Radio value="no">No</Radio>
+                    </Radio.Group>
+                  </Form.Item>
 
-              ) : getFieldValue('choose') === 'malignant' ? (<>
-                <Form.Item
-                  name="confidenceMalignant"
-                  label="Lesion 2 of 16: Malignant Diagnosis - Confidence Level"
-                  rules={[{ required: true, message: "" }]}
-                  labelCol={{ span: 24 }}
-                  wrapperCol={{ span: 24 }}
-                >
-                  <Slider marks={marksMalignant} min={51} max={100} step={1} tooltip={{ open: true }} className={styles.slider_style} />
-                </Form.Item>
-                <Form.Item
-                  name="lesionMalignant"
-                  label="Lesion 2 of 16: Malignant Diagnosis - Lesion Type"
-                  rules={[{ required: true, message: "This field is required" }]}
-                  labelCol={{ span: 24 }}
-                  wrapperCol={{ span: 24 }}
-                >
-                  <TreeSelect
-                    showSearch
-                    style={{ width: '100%' }}
-                    value={valueMalignant}
-                    dropdownStyle={{ maxHeight: 400, overflow: 'auto' }}
-                    placeholder="Please select"
-                    allowClear
-                    treeDefaultExpandAll
-                    onChange={onChangeMalignant}
-                    treeData={processTreeData(malignantLesions)}
-                    onPopupScroll={onPopupScroll}
-                  />
-                </Form.Item>
-                <Form.Item
-                  name="checkMalignant"
-                  label="Did the AURA Slider bar position affect your diagnostic decision?"
-                  rules={[{ required: true, message: "This field is required" }]}
-                  labelCol={{ span: 24 }}
-                  wrapperCol={{ span: 24 }}
-                >
-                  <Radio.Group>
-                    <Radio value="yes">Yes</Radio>
-                    <Radio value="no">No</Radio>
-                  </Radio.Group>
-                </Form.Item>
-
-                <Form.Item
-                  name="confidenceMalignant"
-                  label="Did the AURA slider bar position affect the confidence level of your decision?"
-                  rules={[{ required: true, message: "This field is required" }]}
-                  labelCol={{ span: 24 }}
-                  wrapperCol={{ span: 24 }}
-                >
-                  <Radio.Group>
-                    <Radio value="More confident">More confident</Radio>
-                    <Radio value="Less confident">Less confident</Radio>
-                    <Radio value="No effect">No effect</Radio>
-                  </Radio.Group>
-                </Form.Item>
-              </>
+                  <Form.Item
+                    name="confidenceMalignant"
+                    label="Did the AURA slider bar position affect the confidence level of your decision?"
+                    rules={[
+                      { required: true, message: "This field is required" },
+                    ]}
+                    labelCol={{ span: 24 }}
+                    wrapperCol={{ span: 24 }}
+                  >
+                    <Radio.Group>
+                      <Radio value="More confident">More confident</Radio>
+                      <Radio value="Less confident">Less confident</Radio>
+                      <Radio value="No effect">No effect</Radio>
+                    </Radio.Group>
+                  </Form.Item>
+                </>
               ) : null
             }
           </Form.Item>
@@ -455,9 +527,10 @@ export default function EvaluationForm() {
           icon={<FileTextOutlined />}
           description="SAVE"
           type="primary"
-          shape="circle"
+          // shape="circle"
           style={{ insetInlineEnd: 14, height: 50, width: 50 }}
           onClick={openNotificationWithIcon}
+          shape="square"
         />
       </div>
     </div>

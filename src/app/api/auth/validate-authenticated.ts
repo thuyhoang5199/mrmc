@@ -12,17 +12,8 @@ export function validateAuthenticated({ token }: { token: string | null }) {
         { status: 401 }
       );
     }
-    const [, tokenIgnoreBearer] = token.split(" ");
-    if (!token) {
-      return NextResponse.json(
-        {
-          message: "token is required",
-        },
-        { status: 401 }
-      );
-    }
 
-    const decode = jwt.verify(tokenIgnoreBearer, JWT_SECRET_KEY) as JwtPayload;
+    const decode = jwt.verify(token, JWT_SECRET_KEY) as JwtPayload;
     return {
       username: decode.username,
       id: decode.id,

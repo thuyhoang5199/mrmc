@@ -2,13 +2,12 @@ import jwt from "jsonwebtoken";
 import { NextResponse } from "next/server";
 import {
   EXPIRED_TIME,
-  EXPIRED_TIME_REFRESH_TOKEN,
   GOOGLE_DATA_SPREAD_SHEET_ID,
-  JWT_REFRESH_TOKEN_SECRET_KEY,
   JWT_SECRET_KEY,
 } from "../constants";
 import { getDataInRange } from "../utils/google/common";
 import { get } from "lodash";
+import { serialize } from "cookie";
 
 export async function POST(req: Request) {
   const { username, password } = await req.json();
@@ -60,14 +59,14 @@ export async function POST(req: Request) {
     { expiresIn: EXPIRED_TIME }
   );
 
-  const refreshToken = jwt.sign(
-    {
-      username,
-      id: account.id,
-      name: account.name,
-    },
-    JWT_REFRESH_TOKEN_SECRET_KEY as string,
-    { expiresIn: EXPIRED_TIME_REFRESH_TOKEN }
+  const cookie = serialize("session", token, {
+    httpOnly: true,
+    secure: true,
+    maxAge: 60 * 60 * 24 * 7, // One week
+    path: "/",
+  });
+  return NextResponse.json(
+    { token },
+    { status: 200, headers: { "Set-Cookie": cookie } }
   );
-  return NextResponse.json({ token, refreshToken }, { status: 200 });
 }

@@ -40,3 +40,19 @@ a {
     color-scheme: dark;
   }
 }
+
+.loading-page {
+  z-index: 999;
+  background: linear-gradient(
+    rgba(196, 234, 239, 0.95),
+    rgba(255, 255, 255, 0.98)
+  );
+  position: absolute;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  right: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}

@@ -1,10 +1,10 @@
-'use client';  // Add this line to make this a Client Component
+"use client"; // Add this line to make this a Client Component
 
-import React from 'react';
+import React from "react";
 import styles from "./page.module.css";
-import type { FormProps } from 'antd';
-import { Button, Form, Input, Spin } from 'antd';
-import { useRouter } from 'next/navigation';
+import type { FormProps } from "antd";
+import { Button, Form, Input } from "antd";
+import { useRouter } from "next/navigation";
 
 type FieldType = {
   username?: string;
@@ -13,16 +13,34 @@ type FieldType = {
 
 export default function Home() {
   const router = useRouter();
-  const onFinish: FormProps<FieldType>['onFinish'] = (values) => {
-    console.log('Success:', values);
-    console.log('Navigating to /evaluationForm'); // Thêm dòng này
-    router.push('/evaluationForm');
+  const [form] = Form.useForm();
+  const onFinish: FormProps<FieldType>["onFinish"] = async (values) => {
+    const response = await fetch("/api/auth/", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        username: values.username,
+        password: values.password,
+      }),
+    });
+    if (response.ok) {
+      router.push("/evaluationForm");
+    } else {
+      const error = await response.json();
+      form.setFields([
+        {
+          name: "password",
+          errors: [error.message],
+        },
+      ]);
+    }
   };
 
-  const onFinishFailed: FormProps<FieldType>['onFinishFailed'] = (errorInfo) => {
-    console.log('Failed:', errorInfo);
+  const onFinishFailed: FormProps<FieldType>["onFinishFailed"] = (
+    errorInfo
+  ) => {
+    console.log("Failed:", errorInfo);
   };
-
 
   return (
     <div className={styles.page}>
@@ -36,12 +54,12 @@ export default function Home() {
           onFinish={onFinish}
           onFinishFailed={onFinishFailed}
           autoComplete="off"
-
+          form={form}
         >
           <Form.Item<FieldType>
             label="Username"
             name="username"
-            rules={[{ required: true, message: 'Please input your username!' }]}
+            rules={[{ required: true, message: "Please input your username!" }]}
           >
             <Input />
           </Form.Item>
@@ -49,11 +67,10 @@ export default function Home() {
           <Form.Item<FieldType>
             label="Password"
             name="password"
-            rules={[{ required: true, message: 'Please input your password!' }]}
+            rules={[{ required: true, message: "Please input your password!" }]}
           >
             <Input.Password />
           </Form.Item>
-
 
           <Button htmlType="submit" className={styles.btn} block>
             SIGN IN
