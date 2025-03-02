@@ -40,8 +40,8 @@
 }
 .btn {
   background-color: #13BED8 !important;
-  border-radius: 100px;
-  color: #fff;
+  border-radius: 100px !important;
+  color: #fff !important;
 }
 .btn:hover {
   background-color: #067DB2 !important;

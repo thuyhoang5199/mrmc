@@ -2,9 +2,10 @@
 
 import React, { Fragment, useState } from 'react';
 import styles from "./page.module.css";
-import { Button, Divider, Form, Input, Typography, Select, SliderSingleProps, Slider, TreeSelect, Radio, message } from 'antd';
+import { Button, Divider, Form, Input, Typography, Select, SliderSingleProps, Slider, TreeSelect, Radio, message, FloatButton } from 'antd';
 import { Image } from 'antd';
 import type { TreeSelectProps, RadioChangeEvent } from 'antd';
+import { FileTextOutlined } from '@ant-design/icons';
 
 const { Option } = Select;
 
@@ -12,26 +13,34 @@ const marksBenign: SliderSingleProps['marks'] = {
   1: {
     style: {
       color: '#086f0f',
+      width: "100px",
+      left: "5px"
     },
-    label: <strong className={styles.note_slide}>High confidence Benign</strong>,
+    label: <strong >High confidence Benign</strong>,
   },
   50: {
     style: {
       color: '#9c9006',
+      right: "-10px",
+      width: "100px",
     },
-    label: <strong className={styles.note_slide}>Low confidence Benign</strong>,
+    label: <strong >Low confidence Benign</strong>,
   },
 };
 const marksMalignant: SliderSingleProps['marks'] = {
   51: {
     style: {
       color: '#9c9006',
+      width: "100px",
+      left: "5px"
     },
     label: <strong className={styles.note_slide}>Low confidence Malignant </strong>,
   },
   100: {
     style: {
       color: 'red',
+      right: "-10px",
+      width: "100px",
     },
     label: <strong className={styles.note_slide}>High confidence Malignant </strong>,
   },
@@ -223,7 +232,6 @@ export default function EvaluationForm() {
   const [valueBenign, setValueBenign] = useState<string>();
   const [valueMalignant, setValueMalignant] = useState<string>();
 
-  const [valueCheck, setValueCheck] = useState<string>();
 
 
   const onFinish = (values: any) => {
@@ -251,11 +259,6 @@ export default function EvaluationForm() {
   };
 
 
-  const onCheck = (e: RadioChangeEvent) => {
-    setValueCheck(e.target.value)
-    form.setFieldsValue({ checkMalignant: e.target.value });
-  };
-
   // Recursively disable parent nodes that are not leaves
   const processTreeData = (data: any) => {
     return data.map((node: any) => {
@@ -269,6 +272,7 @@ export default function EvaluationForm() {
       return node;
     });
   };
+
   return (
     <div className={styles.page}>
       <div className={styles.container}>
@@ -285,25 +289,80 @@ export default function EvaluationForm() {
           </Typography.Title>
         </Fragment>
         <Divider />
-        <Form onFinish={onFinish} form={form} className={styles.form_style} >
+        <Form onFinish={onFinish} form={form} className={styles.form_style} initialValues={{ age: 60, gender: "Male", location: "face", size: "5mm" }} >
           {contextHolder}
           <Typography.Title level={4}>
             Please provide your diagnosis for the lesion shown below.
           </Typography.Title>
           <Typography.Title level={5}>
-            Patient's Age: 60
+            <Form.Item
+              name="age"
+              label="Patient's Age:"
+              rules={[{ required: false, }]}
+
+              wrapperCol={{ span: 4 }}
+            >
+              <Input disabled />
+            </Form.Item>
           </Typography.Title>
+
           <Typography.Title level={5}>
-            Patient's Gender: Male
+            <Form.Item
+              name="gender"
+              label="Patient's Gender:"
+              rules={[{ required: false, }]}
+
+              wrapperCol={{ span: 4 }}
+            >
+              <Input disabled />
+            </Form.Item>
           </Typography.Title>
-          <Image
-            src="demo.jpg"
-          />
+
+          <Typography.Title level={5}>
+            <Form.Item
+              name="location"
+              label=" Location of the lesion:"
+              rules={[{ required: false, }]}
+              wrapperCol={{ span: 4 }}
+            >
+              <Input disabled />
+            </Form.Item>
+          </Typography.Title>
+
+          <Typography.Title level={5}>
+            <Form.Item
+              name="size"
+              label="Lesion size:"
+              rules={[{ required: false, }]}
+
+              wrapperCol={{ span: 4 }}
+            >
+              <Input disabled />
+            </Form.Item>
+          </Typography.Title>
+
+          <Typography className={styles.img_gr}>
+            <div className={styles.note_not_img}>
+              <span>Please do not zoom the lesion picture in or out.
+                <br />
+                The default web zoom setting is at 100%,<br /> please do not change it.</span>
+            </div>
+            {/* <Image
+              src="523_003_Aura.jpg"
+              className={styles.img}
+            /> */}
+            <Image
+              src="523_003.jpg"
+              className={styles.img}
+            />
+          </Typography>
+
           <Form.Item name="choose" label="" rules={[{ required: true, message: "This field is required" }]} className={styles.form_item}>
             <Select
               placeholder="Choose"
               allowClear
               onChange={warning}
+              className={styles.select_style}
             >
               <Option value="benign" >Benign</Option>
               <Option value="malignant" >Malignant</Option>
@@ -318,16 +377,16 @@ export default function EvaluationForm() {
                 <>
                   <Form.Item
                     name="confidenceBenign"
-                    label="Part 3 of 10, lesion 1 of 16: Benign Diagnosis - Confidence Level"
-                    rules={[{ required: true, message: "This field is required" }]}
+                    label="Lesion 1 of 16: Benign Diagnosis - Confidence Level"
+                    rules={[{ required: true, message: "" }]}
                     labelCol={{ span: 24 }}
                     wrapperCol={{ span: 24 }}
                   >
-                    <Slider range marks={marksBenign} min={1} max={50} step={5} />
+                    <Slider marks={marksBenign} min={1} max={50} step={1} tooltip={{ open: true }} className={styles.slider_style} />
                   </Form.Item>
                   <Form.Item
                     name="lesionBenign"
-                    label="Part 3 of 10, lesion 2 of 16: Benign Diagnosis - Lesion Type"
+                    label="Lesion 2 of 16: Benign Diagnosis - Lesion Type"
                     rules={[{ required: true, message: "This field is required" }]}
                     labelCol={{ span: 24 }}
                     wrapperCol={{ span: 24 }}
@@ -350,16 +409,16 @@ export default function EvaluationForm() {
               ) : getFieldValue('choose') === 'malignant' ? (<>
                 <Form.Item
                   name="confidenceMalignant"
-                  label="Part 3 of 10, lesion 2 of 16: Malignant Diagnosis - Confidence Level"
-                  rules={[{ required: true, message: "This field is required" }]}
+                  label="Lesion 2 of 16: Malignant Diagnosis - Confidence Level"
+                  rules={[{ required: true, message: "" }]}
                   labelCol={{ span: 24 }}
                   wrapperCol={{ span: 24 }}
                 >
-                  <Slider range marks={marksMalignant} min={51} max={100} step={5} />
+                  <Slider marks={marksMalignant} min={51} max={100} step={1} tooltip={{ open: true }} className={styles.slider_style} />
                 </Form.Item>
                 <Form.Item
                   name="lesionMalignant"
-                  label="Part 3 of 10, lesion 2 of 16: Malignant Diagnosis - Lesion Type"
+                  label="Lesion 2 of 16: Malignant Diagnosis - Lesion Type"
                   rules={[{ required: true, message: "This field is required" }]}
                   labelCol={{ span: 24 }}
                   wrapperCol={{ span: 24 }}
@@ -379,20 +438,29 @@ export default function EvaluationForm() {
                 </Form.Item>
                 <Form.Item
                   name="checkMalignant"
-                  label="Have you considered the slider-bar position when making your diagnostic decision?"
+                  label="Did the AURA Slider bar position affect your diagnostic decision?"
                   rules={[{ required: true, message: "This field is required" }]}
                   labelCol={{ span: 24 }}
                   wrapperCol={{ span: 24 }}
                 >
-                  <Radio.Group
-                    onChange={onCheck}
-                    value={valueCheck}
-                    options={[
-                      { value: "yes", label: 'Yes' },
-                      { value: "no", label: 'No' },
+                  <Radio.Group>
+                    <Radio value="yes">Yes</Radio>
+                    <Radio value="no">No</Radio>
+                  </Radio.Group>
+                </Form.Item>
 
-                    ]}
-                  />
+                <Form.Item
+                  name="confidenceMalignant"
+                  label="Did the AURA slider bar position affect the confidence level of your decision?"
+                  rules={[{ required: true, message: "This field is required" }]}
+                  labelCol={{ span: 24 }}
+                  wrapperCol={{ span: 24 }}
+                >
+                  <Radio.Group>
+                    <Radio value="More confident">More confident</Radio>
+                    <Radio value="Less confident">Less confident</Radio>
+                    <Radio value="No effect">No effect</Radio>
+                  </Radio.Group>
                 </Form.Item>
               </>
               ) : null
@@ -402,7 +470,13 @@ export default function EvaluationForm() {
             NEXT
           </Button>
         </Form>
-
+        <FloatButton
+          icon={<FileTextOutlined />}
+          description="SAVE"
+          type="primary"
+          shape="circle"
+          style={{ insetInlineEnd: 14, height: 50, width: 50 }}
+        />
       </div>
     </div>
   );

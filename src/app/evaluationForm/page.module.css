@@ -6,6 +6,7 @@
 .container {
   width: 80%;
   margin: 0px auto;
+  max-width: 1600px;
 }
 .img_header {
   margin: 0px auto 20px;
@@ -15,22 +16,66 @@
   margin-bottom: 100px;
 }
 .form_item {
-  margin: 15px 0;
+  margin: 15px 0 !important;
 }
 .btn {
-  background-color: #13BED8;
-  border-radius: 100px;
-  color: #fff;
+  background-color: #13BED8 !important;
+  border-radius: 100px !important;
+  color: #fff !important;
+  margin-bottom: 60px;
 }
 .btn:hover {
   background-color: #067DB2 !important;
   color: #fff !important;
 }
+.slider_style {
+ margin: 50px 25px 50px !important;
+}
+
+.img_gr {
+  display: flex ;
+  align-items: center;
+  flex: 1 1;
+  gap: 10px;
+}
+
+.img{
+  height: 350px!important ;
+  width: auto;
+}
+.note_not_img {
+  color: red;
+  font-size: 16px;
+  text-align: center;
+  font-weight: bold;
+  border: 1px solid #000;
+  height: 350px;
+  width: 500px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  background-color: #fff;
+  padding: 10px;
+}
+
+.select_style {
+  margin: 30px 0px !important;
+}
 
 @media (max-width: 600px) {
   .container {
     width: 90%;
-    margin: 0px auto;
     
+  }
+  .img_gr {
+    flex-direction: column;
+  }
+  .img{
+    height: auto ;
+    width: 100%;
+  }
+  .note_not_img {
+    height: 200px;
+    width: 100%;
   }
 }
