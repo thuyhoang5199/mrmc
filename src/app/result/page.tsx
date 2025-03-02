@@ -6,15 +6,15 @@ import styles from "./page.module.css";
 export default function ResultPage() {
   return (
     <div className={styles.page}>
+
       <Image
-        src="bg.png" preview={false}
-        className={styles.img_header}
+        src="video.gif" preview={false}
+        className={styles.gif_style}
       />
       <Result
         status="success"
         title="Successfully MRMC Evaluation "
-      // subTitle="Order number: 2017182818828182881 Cloud server configuration takes 1-5 minutes, please wait."
-
+        className={styles.text_result}
       />
     </div>
 
