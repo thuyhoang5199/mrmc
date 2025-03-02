@@ -12,12 +12,24 @@
   margin: 0px auto 20px;
   border-radius: 10px;
 }
+
+.property {
+  display: flex;
+  gap: 15px;
+}
+
+.input_property {
+  width: 20% !important;
+}
+
 .form_style {
   margin-bottom: 100px;
 }
+
 .form_item {
   margin: 15px 0 !important;
 }
+
 .btn {
   background-color: #13BED8 !important;
   border-radius: 100px !important;
@@ -28,6 +40,7 @@
   background-color: #067DB2 !important;
   color: #fff !important;
 }
+
 .slider_style {
  margin: 50px 25px 50px !important;
 }
@@ -37,12 +50,14 @@
   align-items: center;
   flex: 1 1;
   gap: 10px;
+  margin-top: 15px;
 }
 
 .img{
   height: 350px!important ;
   width: auto;
 }
+
 .note_not_img {
   color: red;
   font-size: 16px;

@@ -2,10 +2,12 @@
 
 import React, { Fragment, useState } from 'react';
 import styles from "./page.module.css";
-import { Button, Divider, Form, Input, Typography, Select, SliderSingleProps, Slider, TreeSelect, Radio, message, FloatButton } from 'antd';
+import { Button, Divider, Form, Input, Typography, Select, SliderSingleProps, Slider, TreeSelect, Radio, message, FloatButton, notification } from 'antd';
 import { Image } from 'antd';
 import type { TreeSelectProps, RadioChangeEvent } from 'antd';
 import { FileTextOutlined } from '@ant-design/icons';
+import { useRouter } from 'next/navigation';
+
 
 const { Option } = Select;
 
@@ -227,8 +229,11 @@ const malignantLesions = [
 ];
 
 export default function EvaluationForm() {
+  const router = useRouter();
   const [form] = Form.useForm();
   const [messageApi, contextHolder] = message.useMessage();
+  const [api, contextHolderNotificationSave] = notification.useNotification();
+
   const [valueBenign, setValueBenign] = useState<string>();
   const [valueMalignant, setValueMalignant] = useState<string>();
 
@@ -236,6 +241,7 @@ export default function EvaluationForm() {
 
   const onFinish = (values: any) => {
     console.log(values);
+    router.push('/result');
   };
   const warning = (value: string) => {
     if (value) {
@@ -272,10 +278,17 @@ export default function EvaluationForm() {
       return node;
     });
   };
-
+  const openNotificationWithIcon = () => {
+    api.success({
+      message: 'Save Success',
+      description:
+        'Your evaluation process has been saved successfully.',
+    });
+  };
   return (
     <div className={styles.page}>
       <div className={styles.container}>
+
         <Image
           src="bg.png" preview={false}
           className={styles.img_header}
@@ -289,57 +302,25 @@ export default function EvaluationForm() {
           </Typography.Title>
         </Fragment>
         <Divider />
-        <Form onFinish={onFinish} form={form} className={styles.form_style} initialValues={{ age: 60, gender: "Male", location: "face", size: "5mm" }} >
+        <Typography.Title level={4}>
+          Please provide your diagnosis for the lesion shown below.
+        </Typography.Title>
+        <Typography.Title level={5} className={styles.property}>Patient's Age:
+          <Input disabled className={styles.input_property} value="30" />
+        </Typography.Title>
+        <Typography.Title level={5} className={styles.property}>Patient's Gender:
+          <Input disabled className={styles.input_property} value="Male" />
+        </Typography.Title>
+        <Typography.Title level={5} className={styles.property}>Location of the lesion:
+          <Input disabled className={styles.input_property} value="Face" />
+        </Typography.Title>
+        <Typography.Title level={5} className={styles.property}>Lesion size:
+          <Input disabled className={styles.input_property} value="5mm" />
+        </Typography.Title>
+
+        <Form onFinish={onFinish} form={form} className={styles.form_style} >
           {contextHolder}
-          <Typography.Title level={4}>
-            Please provide your diagnosis for the lesion shown below.
-          </Typography.Title>
-          <Typography.Title level={5}>
-            <Form.Item
-              name="age"
-              label="Patient's Age:"
-              rules={[{ required: false, }]}
-
-              wrapperCol={{ span: 4 }}
-            >
-              <Input disabled />
-            </Form.Item>
-          </Typography.Title>
-
-          <Typography.Title level={5}>
-            <Form.Item
-              name="gender"
-              label="Patient's Gender:"
-              rules={[{ required: false, }]}
-
-              wrapperCol={{ span: 4 }}
-            >
-              <Input disabled />
-            </Form.Item>
-          </Typography.Title>
-
-          <Typography.Title level={5}>
-            <Form.Item
-              name="location"
-              label=" Location of the lesion:"
-              rules={[{ required: false, }]}
-              wrapperCol={{ span: 4 }}
-            >
-              <Input disabled />
-            </Form.Item>
-          </Typography.Title>
-
-          <Typography.Title level={5}>
-            <Form.Item
-              name="size"
-              label="Lesion size:"
-              rules={[{ required: false, }]}
-
-              wrapperCol={{ span: 4 }}
-            >
-              <Input disabled />
-            </Form.Item>
-          </Typography.Title>
+          {contextHolderNotificationSave}
 
           <Typography className={styles.img_gr}>
             <div className={styles.note_not_img}>
@@ -476,6 +457,7 @@ export default function EvaluationForm() {
           type="primary"
           shape="circle"
           style={{ insetInlineEnd: 14, height: 50, width: 50 }}
+          onClick={openNotificationWithIcon}
         />
       </div>
     </div>
