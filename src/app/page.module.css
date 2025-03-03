@@ -52,7 +52,7 @@
 .form_login {
   max-width: 600px;/* Điều chỉnh chiều rộng theo ý muốn */
   text-align: center;
-  padding: 120px 20px 30px 20px !important; 
+  padding: 90px 20px 30px 20px !important; 
   border: 2px solid transparent; /* Đường viền màu xám nhạt */
   border-radius: 10px; /* Bo tròn góc */
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Tạo bóng đổ nhẹ */
@@ -86,7 +86,10 @@
   background-image: url('/logoVita.png'); 
   background-size: cover;
 }
-
+.title {
+  margin-bottom: 30px !important;
+  color: #063e5c !important ;
+}
 @media (max-width: 600px) {
   .page {
     padding: 32px;

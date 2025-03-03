@@ -3,7 +3,7 @@
 import React from "react";
 import styles from "./page.module.css";
 import type { FormProps } from "antd";
-import { Button, Form, Input } from "antd";
+import { Button, Form, Input, Typography } from "antd";
 import { useRouter } from "next/navigation";
 
 type FieldType = {
@@ -56,6 +56,9 @@ export default function Home() {
           autoComplete="off"
           form={form}
         >
+          <Typography.Title level={5} className={styles.title}>
+            Welcome to <br />the Multi-Reader Multi-Case (MRMC) Study
+          </Typography.Title>
           <Form.Item<FieldType>
             label="Username"
             name="username"

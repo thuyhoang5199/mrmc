@@ -3,19 +3,33 @@
   display: grid;
   place-items: center; 
 }
+
 .container {
   width: 80%;
   margin: 0px auto;
-  max-width: 1600px;
+  max-width: 1000px !important;
 }
+
 .img_header {
   margin: 0px auto 20px;
   border-radius: 10px;
 }
 
-.property {
+.property_gr {
   display: flex;
-  gap: 15px;
+  align-items: center;
+  gap: 20px;
+  margin-bottom: 15px;
+  margin-top: 15px;
+}
+
+.property {
+  /* display: flex;
+  gap: 15px; */
+  margin-bottom: unset !important;
+}
+.property_value {
+  font-size: 16px !important;
 }
 
 .input_property {
@@ -55,7 +69,7 @@
 
 .img{
   height: 350px!important ;
-  width: auto;
+  width: 495px !important;
 }
 
 .note_not_img {
@@ -76,8 +90,14 @@
 .select_style {
   margin: 30px 0px !important;
 }
+@media (max-width: 1200px) {
+  .img{
+    height: 250px!important ;
+    width: auto !important;
+  }
 
-@media (max-width: 600px) {
+}
+@media (max-width: 768px) {
   .container {
     width: 90%;
     

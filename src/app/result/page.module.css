@@ -7,9 +7,22 @@
   align-items: center;
   height: 100vh;
 }
+
 .gif_style {
   max-width: 500px !important;
 }
+
 .text_result {
   padding: 20px !important
+}
+
+.btn {
+  background-color: #13BED8 !important;
+  border-radius: 100px !important;
+  color: #fff !important;
+}
+
+.btn:hover {
+  background-color: #067DB2 !important;
+  color: #fff !important;
 }

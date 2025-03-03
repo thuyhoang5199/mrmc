@@ -6,7 +6,6 @@ import {
   Button,
   Divider,
   Form,
-  Input,
   Typography,
   Select,
   SliderSingleProps,
@@ -69,32 +68,17 @@ const benignLesions = [
   {
     value: "benign 1",
     title: "Seborrheic Keratosis (SK)",
-    children: [
-      {
-        value: "children 7",
-        title: "children",
-      },
-    ],
+
   },
   {
     value: "benign 2",
     title: "Nevus",
-    children: [
-      {
-        value: "children 2",
-        title: "children",
-      },
-    ],
+
   },
   {
     value: "benign 3",
     title: "Dermatofibroma",
-    children: [
-      {
-        value: "children 1",
-        title: "children",
-      },
-    ],
+
   },
   {
     value: "benign 4",
@@ -214,11 +198,21 @@ const malignantLesions = [
   },
 ];
 
+// Define the type of currentData
+interface CurrentData {
+  lesion: number;
+  eval: number;
+  eval1: unknown; // eval1 as an object or null
+  eval2: unknown; // eval2 as an object or null
+}
+
 export default function EvaluationForm() {
   const router = useRouter();
   const [form] = Form.useForm();
+
   const [messageApi, contextHolder] = message.useMessage();
   const [api, contextHolderNotificationSave] = notification.useNotification();
+
   const [isLoading, setIsLoading] = useState(false);
   const [questionInfo, setQuestionInfo] = useState({
     nextQuestionIndex: 1,
@@ -231,6 +225,27 @@ export default function EvaluationForm() {
     lesionId: null,
     doctorName: "",
   });
+
+  const [currentData, setCurrentData] = useState<CurrentData>(() => {
+    // Try to get data from localStorage and parse it, or use default values if not available
+    const storedData = localStorage.getItem('currentData');
+    if (storedData) {
+      return JSON.parse(storedData);
+    }
+    return {
+      lesion: 1,
+      eval: 1,
+      eval1: null, // Default object for eval1
+      eval2: null, // Default object for eval2
+    };
+  });
+
+  // Optional: You can use useEffect to sync the state with localStorage if it changes
+  useEffect(() => {
+    localStorage.setItem('currentData', JSON.stringify(currentData));
+  }, [currentData]); // This effect will run when `currentData` changes
+
+
   useEffect(() => {
     setIsLoading(true);
     fetch("/api/question")
@@ -254,6 +269,24 @@ export default function EvaluationForm() {
       });
   }, []);
 
+
+  const onSubmit = (values: unknown) => {
+    if (currentData.eval === 1) {
+      setCurrentData({
+        ...currentData, eval: 2, eval1: values
+      })
+      form.resetFields()
+    } else {
+      onFinish(values)
+      setCurrentData({
+        lesion: currentData.lesion + 1,
+        eval: 1,
+        eval1: null, // Default object for eval1
+        eval2: null, // Default object for eval2
+      })
+    }
+  }
+
   const onFinish = (values: unknown) => {
     setIsLoading(true);
     fetch("/api/question", {
@@ -265,6 +298,12 @@ export default function EvaluationForm() {
         const data = await res.json();
         if (data?.successAll) {
           router.replace("/result");
+          setCurrentData({
+            lesion: 1,
+            eval: 1,
+            eval1: null, // Default object for eval1
+            eval2: null, // Default object for eval2
+          })
         }
         setQuestionInfo(data);
         form.resetFields();
@@ -280,6 +319,8 @@ export default function EvaluationForm() {
         setIsLoading(false);
       });
   };
+
+
   const warning = (value: string) => {
     if (value) {
       messageApi.open({
@@ -324,7 +365,7 @@ export default function EvaluationForm() {
         />
         <Fragment>
           <Typography.Title level={3}>
-            MRMC Evaluation - Part {questionInfo.nextQuestionIndex} of 160
+            MRMC Evaluation - Part {currentData.lesion} of 160
           </Typography.Title>
           <Typography.Title level={5}>
             Acc: {questionInfo.doctorName}
@@ -334,57 +375,54 @@ export default function EvaluationForm() {
         <Typography.Title level={4}>
           Please provide your diagnosis for the lesion shown below.
         </Typography.Title>
-        <Typography.Title level={5} className={styles.property}>
-          Patient&apos;s Age:
-          <Input
-            disabled
-            className={styles.input_property}
-            value={questionInfo.patientAge}
-          />
-        </Typography.Title>
-        <Typography.Title level={5} className={styles.property}>
-          Patient&apos;s Gender:
-          <Input
-            disabled
-            className={styles.input_property}
-            value={questionInfo.patientGender}
-          />
-        </Typography.Title>
-        <Typography.Title level={5} className={styles.property}>
-          Location of the lesion:
-          <Input
-            disabled
-            className={styles.input_property}
-            value={questionInfo.lesionLocation}
-          />
-        </Typography.Title>
-        <Typography.Title level={5} className={styles.property}>
-          Lesion size:
-          <Input
-            disabled
-            className={styles.input_property}
-            value={questionInfo.lesionSize}
-          />
-        </Typography.Title>
 
-        <Form onFinish={onFinish} form={form} className={styles.form_style}>
+        <Typography className={styles.property_gr}>
+          <Typography.Title level={5} className={styles.property}>
+            Patient&apos;s Age:
+          </Typography.Title>
+          <Typography.Text className={styles.property_value}>{questionInfo.patientAge}</Typography.Text>
+        </Typography>
+
+        <Typography className={styles.property_gr}>
+          <Typography.Title level={5} className={styles.property}>
+            Patient&apos;s Gender:
+          </Typography.Title>
+          <Typography.Text className={styles.property_value}>{questionInfo.patientGender}</Typography.Text>
+        </Typography>
+
+        <Typography className={styles.property_gr}>
+          <Typography.Title level={5} className={styles.property}>
+            Location of the lesion:
+          </Typography.Title>
+          <Typography.Text className={styles.property_value}>{questionInfo.lesionLocation}</Typography.Text>
+        </Typography>
+
+        <Typography className={styles.property_gr}>
+          <Typography.Title level={5} className={styles.property}>
+            Lesion size:
+          </Typography.Title>
+          <Typography.Text className={styles.property_value}>{questionInfo.lesionSize}</Typography.Text>
+        </Typography>
+
+        <Form onFinish={onSubmit} form={form} className={styles.form_style} initialValues={{ confidenceBenign: "1", confidenceMalignant: "51" }}>
           {contextHolder}
           {contextHolderNotificationSave}
 
           <Typography className={styles.img_gr}>
-            <div className={styles.note_not_img}>
+            {currentData.eval === 2 ? (<Image
+              src={`${questionInfo.lesionAuraResultScreen}.jpg`}
+              className={styles.img}
+            />) : (<div className={styles.note_not_img}>
               <span>
                 Please do not zoom the lesion picture in or out.
                 <br />
                 The default web zoom setting is at 100%,
                 <br /> please do not change it.
               </span>
-            </div>
-            {/* <Image
-              src="523_003_Aura.jpg"
-              className={styles.img}
-            /> */}
-            <Image src="523_003.jpg" className={styles.img} />
+            </div>)}
+
+
+            <Image src={`${questionInfo.lesionPicture}.jpg`} className={styles.img} />
           </Typography>
 
           <Form.Item
@@ -392,6 +430,7 @@ export default function EvaluationForm() {
             label=""
             rules={[{ required: true, message: "This field is required" }]}
             className={styles.form_item}
+            wrapperCol={{ span: 24 }}
           >
             <Select
               placeholder="Choose"
@@ -414,7 +453,7 @@ export default function EvaluationForm() {
                 <>
                   <Form.Item
                     name="confidenceBenign"
-                    label="Lesion 1 of 16: Benign Diagnosis - Confidence Level"
+                    label={`Lesion ${currentData.lesion} of 160: Benign Diagnosis - Confidence Level`}
                     rules={[{ required: true, message: "" }]}
                     labelCol={{ span: 24 }}
                     wrapperCol={{ span: 24 }}
@@ -430,7 +469,7 @@ export default function EvaluationForm() {
                   </Form.Item>
                   <Form.Item
                     name="lesionBenign"
-                    label="Lesion 2 of 16: Benign Diagnosis - Lesion Type"
+                    label={`Lesion ${currentData.lesion} of 160: Benign Diagnosis - Lesion Type`}
                     rules={[
                       { required: true, message: "This field is required" },
                     ]}
@@ -441,19 +480,49 @@ export default function EvaluationForm() {
                     <TreeSelect
                       showSearch
                       style={{ width: "100%" }}
-                      dropdownStyle={{ maxHeight: 400, overflow: "auto" }}
+                      dropdownStyle={{ maxHeight: 400, overflow: "auto", zIndex: 9999, }}
                       placeholder="Please select"
                       allowClear
                       // treeDefaultExpandAll
                       treeData={processTreeData(benignLesions)}
                     />
                   </Form.Item>
+                  {currentData.eval === 2 ? (<><Form.Item
+                    name="checkBenign "
+                    label="Did the AURA Slider bar position affect your diagnostic decision?"
+                    rules={[
+                      { required: true, message: "This field is required" },
+                    ]}
+                    labelCol={{ span: 24 }}
+                    wrapperCol={{ span: 24 }}
+                  >
+                    <Radio.Group>
+                      <Radio value="yes">Yes</Radio>
+                      <Radio value="no">No</Radio>
+                    </Radio.Group>
+                  </Form.Item>
+
+                    <Form.Item
+                      name="confidenceBenignCheck"
+                      label="Did the AURA slider bar position affect the confidence level of your decision?"
+                      rules={[
+                        { required: true, message: "This field is required" },
+                      ]}
+                      labelCol={{ span: 24 }}
+                      wrapperCol={{ span: 24 }}
+                    >
+                      <Radio.Group>
+                        <Radio value="MoreConfident">More confident</Radio>
+                        <Radio value="LessConfident">Less confident</Radio>
+                        <Radio value="NoEffect">No effect</Radio>
+                      </Radio.Group>
+                    </Form.Item></>) : null}
                 </>
               ) : getFieldValue("choose") === "malignant" ? (
                 <>
                   <Form.Item
                     name="confidenceMalignant"
-                    label="Lesion 2 of 16: Malignant Diagnosis - Confidence Level"
+                    label={`Lesion ${currentData.lesion} of 160: Malignant Diagnosis - Confidence Level`}
                     rules={[{ required: true, message: "" }]}
                     labelCol={{ span: 24 }}
                     wrapperCol={{ span: 24 }}
@@ -469,7 +538,7 @@ export default function EvaluationForm() {
                   </Form.Item>
                   <Form.Item
                     name="lesionMalignant"
-                    label="Lesion 2 of 16: Malignant Diagnosis - Lesion Type"
+                    label={`Lesion ${currentData.lesion} of 160: Malignant Diagnosis - Lesion Type`}
                     rules={[
                       { required: true, message: "This field is required" },
                     ]}
@@ -480,14 +549,14 @@ export default function EvaluationForm() {
                     <TreeSelect
                       showSearch
                       style={{ width: "100%" }}
-                      dropdownStyle={{ maxHeight: 400, overflow: "auto" }}
+                      dropdownStyle={{ maxHeight: 400, overflow: "auto", zIndex: 9999, }}
                       placeholder="Please select"
                       allowClear
                       // treeDefaultExpandAll
                       treeData={processTreeData(malignantLesions)}
                     />
                   </Form.Item>
-                  <Form.Item
+                  {currentData.eval === 2 ? (<><Form.Item
                     name="checkMalignant"
                     label="Did the AURA Slider bar position affect your diagnostic decision?"
                     rules={[
@@ -502,21 +571,22 @@ export default function EvaluationForm() {
                     </Radio.Group>
                   </Form.Item>
 
-                  <Form.Item
-                    name="confidenceMalignant"
-                    label="Did the AURA slider bar position affect the confidence level of your decision?"
-                    rules={[
-                      { required: true, message: "This field is required" },
-                    ]}
-                    labelCol={{ span: 24 }}
-                    wrapperCol={{ span: 24 }}
-                  >
-                    <Radio.Group>
-                      <Radio value="More confident">More confident</Radio>
-                      <Radio value="Less confident">Less confident</Radio>
-                      <Radio value="No effect">No effect</Radio>
-                    </Radio.Group>
-                  </Form.Item>
+                    <Form.Item
+                      name="confidenceMalignantCheck"
+                      label="Did the AURA slider bar position affect the confidence level of your decision?"
+                      rules={[
+                        { required: true, message: "This field is required" },
+                      ]}
+                      labelCol={{ span: 24 }}
+                      wrapperCol={{ span: 24 }}
+                    >
+                      <Radio.Group>
+                        <Radio value="MoreConfident">More confident</Radio>
+                        <Radio value="LessConfident">Less confident</Radio>
+                        <Radio value="NoEffect">No effect</Radio>
+                      </Radio.Group>
+                    </Form.Item></>) : null}
+
                 </>
               ) : null
             }
