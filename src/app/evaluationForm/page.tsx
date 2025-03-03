@@ -216,7 +216,6 @@ export default function EvaluationForm() {
         eval2: null, // Default object for eval2
       })
     }
-    setDeadline(Date.now() + 1000 * 60)
   }
 
   const onFinish = (values: unknown) => {
@@ -249,6 +248,7 @@ export default function EvaluationForm() {
       })
       .finally(() => {
         setIsLoading(false);
+        setDeadline(Date.now() + 1000 * 60)
       });
   };
 
