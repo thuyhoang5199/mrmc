@@ -40,13 +40,13 @@
   margin-bottom: 100px;
 }
 
-.form_item {
+/* .form_item {
   margin: 15px 0 !important;
-}
+} */
 
 .label_item {
   font-size: 16px;
-  margin-bottom: 15px !important;
+  /* margin-bottom: 15px !important; */
   font-weight: 600;
 }
 
@@ -82,7 +82,7 @@
 
 .note_not_img {
   color: red;
-  font-size: 16px;
+  font-size: 17px;
   text-align: center;
   font-weight: bold;
   border: 1px solid #000;

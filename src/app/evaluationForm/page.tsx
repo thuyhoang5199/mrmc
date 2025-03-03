@@ -379,6 +379,9 @@ export default function EvaluationForm() {
             {({ getFieldValue }) =>
               getFieldValue("choose") === "benign" ? (
                 <>
+                  <label className={styles.label_item}> {/* Direct label styling */}
+                    <span style={{ color: "red" }}>*</span> Lesion {currentData.lesion} of 160: Benign Diagnosis - Confidence Level
+                  </label>
                   <Form.Item
                     name="confidenceBenign"
                     label=""
@@ -387,9 +390,7 @@ export default function EvaluationForm() {
                     wrapperCol={{ span: 24 }}
                     className={styles.form_item}
                   >
-                    <label className={styles.label_item}> {/* Direct label styling */}
-                      <span style={{ color: "red" }}>*</span> Lesion {currentData.lesion} of 160: Benign Diagnosis - Confidence Level
-                    </label>
+
                     <Slider
                       marks={marksBenign}
                       min={1}
@@ -399,6 +400,10 @@ export default function EvaluationForm() {
                       className={styles.slider_style}
                     />
                   </Form.Item>
+
+                  <label className={styles.label_item}> {/* Direct label styling */}
+                    <span style={{ color: "red" }}>*</span> Lesion {currentData.lesion} of 160: Benign Diagnosis - Lesion Type
+                  </label>
                   <Form.Item
                     name="lesionBenign"
                     label=""
@@ -410,12 +415,10 @@ export default function EvaluationForm() {
                     valuePropName="select"
                     className={styles.form_item}
                   >
-                    <label className={styles.label_item}> {/* Direct label styling */}
-                      <span style={{ color: "red" }}>*</span> Lesion {currentData.lesion} of 160: Benign Diagnosis - Lesion Type
-                    </label>
+
                     <TreeSelect
                       showSearch
-                      style={{ width: "100%", marginTop: "15px" }}
+                      style={{ width: "100%", marginTop: "10px" }}
                       dropdownStyle={{ maxHeight: 400, overflow: "auto", zIndex: 9999, }}
                       placeholder="Please select"
                       allowClear
@@ -425,6 +428,9 @@ export default function EvaluationForm() {
                     />
                   </Form.Item>
                   {currentData.eval === 2 ? (<>
+                    <label className={styles.label_item}> {/* Direct label styling */}
+                      <span style={{ color: "red" }}>*</span> Did the AURA Slider bar position affect your diagnostic decision? <br />
+                    </label>
                     <Form.Item
                       name="checkBenign "
                       label=""
@@ -435,15 +441,16 @@ export default function EvaluationForm() {
                       wrapperCol={{ span: 24 }}
                       className={styles.form_item}
                     >
-                      <label className={styles.label_item}> {/* Direct label styling */}
-                        <span style={{ color: "red" }}>*</span> Did the AURA Slider bar position affect your diagnostic decision? <br />
-                      </label>
-                      <Radio.Group style={{ marginTop: "15px" }}>
+
+                      <Radio.Group style={{ marginTop: "10px" }}>
                         <Radio value="yes" style={{ fontSize: "16px" }}>Yes</Radio>
                         <Radio value="no" style={{ fontSize: "16px" }}>No</Radio>
                       </Radio.Group>
                     </Form.Item>
 
+                    <label className={styles.label_item}> {/* Direct label styling */}
+                      <span style={{ color: "red" }}>*</span> Did the AURA slider bar position affect the confidence level of your decision? <br />
+                    </label>
                     <Form.Item
                       name="confidenceBenignCheck"
                       label=""
@@ -454,10 +461,7 @@ export default function EvaluationForm() {
                       wrapperCol={{ span: 24 }}
                       className={styles.form_item}
                     >
-                      <label className={styles.label_item}> {/* Direct label styling */}
-                        <span style={{ color: "red" }}>*</span> Did the AURA slider bar position affect the confidence level of your decision? <br />
-                      </label>
-                      <Radio.Group style={{ marginTop: "15px" }}>
+                      <Radio.Group style={{ marginTop: "10px" }}>
                         <Radio value="MoreConfident" style={{ fontSize: "16px" }}>More confident</Radio>
                         <Radio value="LessConfident" style={{ fontSize: "16px" }}>Less confident</Radio>
                         <Radio value="NoEffect" style={{ fontSize: "16px" }}>No effect</Radio>
@@ -466,6 +470,9 @@ export default function EvaluationForm() {
                 </>
               ) : getFieldValue("choose") === "malignant" ? (
                 <>
+                  <label className={styles.label_item}> {/* Direct label styling */}
+                    <span style={{ color: "red" }}>*</span> Lesion {currentData.lesion} of 160: Malignant Diagnosis - Confidence Level
+                  </label>
                   <Form.Item
                     name="confidenceMalignant"
                     label=""
@@ -474,9 +481,7 @@ export default function EvaluationForm() {
                     wrapperCol={{ span: 24 }}
                     className={styles.form_item}
                   >
-                    <label className={styles.label_item}> {/* Direct label styling */}
-                      <span style={{ color: "red" }}>*</span> Lesion {currentData.lesion} of 160: Malignant Diagnosis - Confidence Level
-                    </label>
+
                     <Slider
                       marks={marksMalignant}
                       min={51}
@@ -486,6 +491,9 @@ export default function EvaluationForm() {
                       className={styles.slider_style}
                     />
                   </Form.Item>
+                  <label className={styles.label_item}> {/* Direct label styling */}
+                    <span style={{ color: "red" }}>*</span> Lesion {currentData.lesion} of 160: Malignant Diagnosis - Lesion Type
+                  </label>
                   <Form.Item
                     name="lesionMalignant"
                     label=""
@@ -497,12 +505,10 @@ export default function EvaluationForm() {
                     valuePropName="select"
                     className={styles.form_item}
                   >
-                    <label className={styles.label_item}> {/* Direct label styling */}
-                      <span style={{ color: "red" }}>*</span> Lesion {currentData.lesion} of 160: Malignant Diagnosis - Lesion Type
-                    </label>
+
                     <TreeSelect
                       showSearch
-                      style={{ width: "100%", marginTop: "15px" }}
+                      style={{ width: "100%", marginTop: "10px" }}
                       dropdownStyle={{ maxHeight: 400, overflow: "auto", zIndex: 9999, }}
                       placeholder="Please select"
                       allowClear
@@ -511,6 +517,9 @@ export default function EvaluationForm() {
                     />
                   </Form.Item>
                   {currentData.eval === 2 ? (<>
+                    <label className={styles.label_item}> {/* Direct label styling */}
+                      <span style={{ color: "red" }}>*</span> Did the AURA Slider bar position affect your diagnostic decision? <br />
+                    </label>
                     <Form.Item
                       name="checkBenign "
                       label=""
@@ -521,15 +530,15 @@ export default function EvaluationForm() {
                       wrapperCol={{ span: 24 }}
                       className={styles.form_item}
                     >
-                      <label className={styles.label_item}> {/* Direct label styling */}
-                        <span style={{ color: "red" }}>*</span> Did the AURA Slider bar position affect your diagnostic decision? <br />
-                      </label>
-                      <Radio.Group style={{ marginTop: "15px" }}>
+
+                      <Radio.Group style={{ marginTop: "10px" }}>
                         <Radio value="yes" style={{ fontSize: "16px" }}>Yes</Radio>
                         <Radio value="no" style={{ fontSize: "16px" }}>No</Radio>
                       </Radio.Group>
                     </Form.Item>
-
+                    <label className={styles.label_item}> {/* Direct label styling */}
+                      <span style={{ color: "red" }}>*</span> Did the AURA slider bar position affect the confidence level of your decision? <br />
+                    </label>
                     <Form.Item
                       name="confidenceBenignCheck"
                       label=""
@@ -540,10 +549,8 @@ export default function EvaluationForm() {
                       wrapperCol={{ span: 24 }}
                       className={styles.form_item}
                     >
-                      <label className={styles.label_item}> {/* Direct label styling */}
-                        <span style={{ color: "red" }}>*</span> Did the AURA slider bar position affect the confidence level of your decision? <br />
-                      </label>
-                      <Radio.Group style={{ marginTop: "15px" }}>
+
+                      <Radio.Group style={{ marginTop: "10px" }}>
                         <Radio value="MoreConfident" style={{ fontSize: "16px" }}>More confident</Radio>
                         <Radio value="LessConfident" style={{ fontSize: "16px" }}>Less confident</Radio>
                         <Radio value="NoEffect" style={{ fontSize: "16px" }}>No effect</Radio>
