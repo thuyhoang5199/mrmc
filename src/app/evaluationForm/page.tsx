@@ -226,24 +226,29 @@ export default function EvaluationForm() {
     doctorName: "",
   });
 
-  const [currentData, setCurrentData] = useState<CurrentData>(() => {
-    // Try to get data from localStorage and parse it, or use default values if not available
-    const storedData = localStorage.getItem('currentData');
-    if (storedData) {
-      return JSON.parse(storedData);
-    }
-    return {
-      lesion: 1,
-      eval: 1,
-      eval1: null, // Default object for eval1
-      eval2: null, // Default object for eval2
-    };
+  const [currentData, setCurrentData] = useState<CurrentData>({
+    lesion: 1,
+    eval: 1,
+    eval1: null, // Default object for eval1
+    eval2: null, // Default object for eval2
   });
 
-  // Optional: You can use useEffect to sync the state with localStorage if it changes
+  // Fetch data from localStorage when the component mounts
   useEffect(() => {
-    localStorage.setItem('currentData', JSON.stringify(currentData));
-  }, [currentData]); // This effect will run when `currentData` changes
+    if (typeof window !== 'undefined') {
+      const storedData = localStorage.getItem('currentData');
+      if (storedData) {
+        setCurrentData(JSON.parse(storedData));
+      }
+    }
+  }, []); // This will run only once after the component mounts
+
+  // Sync the currentData with localStorage whenever it changes
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('currentData', JSON.stringify(currentData));
+    }
+  }, [currentData]); // This will run whenever currentData changes
 
 
   useEffect(() => {
@@ -353,9 +358,9 @@ export default function EvaluationForm() {
     });
   };
 
-  if (isLoading) return <LoadingPage />;
+  // if (isLoading) return <LoadingPage />;
   return (
-    <div className={styles.page}>
+    isLoading ? (<LoadingPage />) : (<div className={styles.page}>
       <div className={styles.container}>
         <Image
           alt="background"
@@ -606,5 +611,6 @@ export default function EvaluationForm() {
         />
       </div>
     </div>
+    )
   );
 }
