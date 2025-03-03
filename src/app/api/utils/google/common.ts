@@ -23,6 +23,7 @@ export async function getDataInRange({
     //todo: retry change profile and get data again
     console.log("getDataInRange Error: ", e);
     if (get(e, "status") === 429) {
+      await sleep(3000);
       return await getDataInRange({
         range,
         spreadsheetId,
@@ -34,34 +35,35 @@ export async function getDataInRange({
 }
 
 export async function writeDataInRange({
-  range,
   spreadsheetId,
   profileIndex = 0,
   data,
 }: {
-  range: string;
   spreadsheetId: string;
   profileIndex?: number;
-  data: Array<Array<string>>;
+  data: Array<{
+    range: string;
+    values: Array<Array<string>>;
+  }>;
 }): Promise<unknown> {
   try {
     const sheets = getSheet({ profileIndex });
-    await sheets.spreadsheets.values.update({
+    await sheets.spreadsheets.values.batchUpdate({
       spreadsheetId,
-      range,
-      valueInputOption: "RAW",
       requestBody: {
-        majorDimension: "ROWS",
-        range: range,
-        values: data,
+        data: data.map((item) => ({
+          majorDimension: "ROWS",
+          ...item,
+        })),
+        valueInputOption: "RAW",
       },
     });
   } catch (e) {
     //todo: retry change profile and get data again
     console.log("writeDataInRange Error: ", e);
     if (get(e, "status") == 429) {
+      await sleep(3000);
       return await writeDataInRange({
-        range,
         spreadsheetId,
         profileIndex: (profileIndex += 1),
         data,
@@ -84,4 +86,20 @@ function getSheet({ profileIndex }: { profileIndex: number }) {
 
   const sheets = google.sheets({ version: "v4", auth: auth });
   return sheets;
+}
+
+export const sleep = (ms: number): Promise<void> =>
+  new Promise((resolve) => setTimeout(resolve, ms));
+
+export function getColumnNameByIndex(n: number) {
+  const ordA = "A".charCodeAt(0);
+  const ordZ = "Z".charCodeAt(0);
+  const len = ordZ - ordA + 1;
+
+  let s = "";
+  while (n >= 0) {
+    s = String.fromCharCode((n % len) + ordA) + s;
+    n = Math.floor(n / len) - 1;
+  }
+  return s;
 }

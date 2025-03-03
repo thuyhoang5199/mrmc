@@ -1,7 +1,6 @@
-export const JWT_SECRET_KEY = "xinchao";
-export const JWT_REFRESH_TOKEN_SECRET_KEY = "baibai";
+export const JWT_SECRET_KEY =
+  "xO1oRAVlh0iNf1yHJgZnDJFYpsrdzWgXxaHX5UBj5nZ08Cz9LhjL";
 export const EXPIRED_TIME = "1 weeks";
-export const EXPIRED_TIME_REFRESH_TOKEN = "30 days";
 
 export const GOOGLE_PROFILES = [
   {
@@ -19,4 +18,4 @@ export const GOOGLE_PROFILES = [
 export const GOOGLE_DATA_SPREAD_SHEET_ID =
   "1SyD7WLcbwciBgcAfzBNB_Ocu38jno0OkHpQVUJWBhJw";
 
-export const LESION_LENGTH = 3;
+export const LESION_LENGTH = 160;

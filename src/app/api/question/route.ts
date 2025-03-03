@@ -2,7 +2,11 @@ import { get } from "lodash";
 import { NextRequest, NextResponse } from "next/server";
 import { validateAuthenticated } from "../auth/validate-authenticated";
 import { GOOGLE_DATA_SPREAD_SHEET_ID, LESION_LENGTH } from "../constants";
-import { getDataInRange, writeDataInRange } from "../utils/google/common";
+import {
+  getColumnNameByIndex,
+  getDataInRange,
+  writeDataInRange,
+} from "../utils/google/common";
 import { cookies } from "next/headers";
 
 export async function GET() {
@@ -32,6 +36,7 @@ export async function GET() {
     (item) => item.accountId == account.id
   );
   let nextQuestionIndex: number;
+  let nextQuestionIndexInListQuestion = 1;
 
   if (!currentAnswer) {
     let index = 1;
@@ -45,12 +50,20 @@ export async function GET() {
     const nextIndexToWrite = answers.length + 3;
     nextQuestionIndex = listLesion[0];
     await writeDataInRange({
-      range: `Answer!A${nextIndexToWrite}:C${nextIndexToWrite}`,
       spreadsheetId: GOOGLE_DATA_SPREAD_SHEET_ID,
-      data: [[account.id, listLesion.join("|"), nextQuestionIndex]],
+      data: [
+        {
+          range: `Answer!A${nextIndexToWrite}:C${nextIndexToWrite}`,
+          values: [[account.id, listLesion.join("|"), nextQuestionIndex]],
+        },
+      ],
     });
   } else {
     nextQuestionIndex = Number(currentAnswer.currentLesion);
+    nextQuestionIndexInListQuestion =
+      currentAnswer.listLesion
+        .split("|")
+        .indexOf(nextQuestionIndex.toString()) + 1;
     if (nextQuestionIndex == -1) {
       return NextResponse.json({ successAll: true }, { status: 200 });
     }
@@ -73,15 +86,19 @@ export async function GET() {
     };
   });
   return NextResponse.json(
-    { nextQuestionIndex, ...question[0] },
+    {
+      nextQuestionIndexInListQuestion,
+      lesionLength: LESION_LENGTH,
+      ...question[0],
+      account,
+    },
     { status: 200 }
   );
 }
 
 export async function POST(req: NextRequest) {
   const cookie = (await cookies()).get("session")?.value;
-  // const { username, password } = await req.json();
-  console.log(req);
+  const { eval1, eval2 } = await req.json();
   const account = validateAuthenticated({
     token: cookie as string,
   });
@@ -125,10 +142,49 @@ export async function POST(req: NextRequest) {
       ];
 
     const answerIndex = answersFormatted.indexOf(currentAnswer) + 3; // +1 to goto index in excel, +2 because 2 shift
+    const lesionAnswer1Column = getColumnNameByIndex(
+      currentAnswer.currentLesion * 2 + 1
+    );
+    const lesionAnswer2Column = getColumnNameByIndex(
+      currentAnswer.currentLesion * 2 + 2
+    );
     await writeDataInRange({
-      range: `Answer!C${answerIndex}:C${answerIndex}`,
       spreadsheetId: GOOGLE_DATA_SPREAD_SHEET_ID,
-      data: [[nextQuestionIndex || "-1"]],
+      data: [
+        {
+          values: [[nextQuestionIndex || "-1"]],
+          range: `Answer!C${answerIndex}:C${answerIndex}`,
+        },
+        {
+          range: `Answer!${lesionAnswer1Column}${answerIndex}:${lesionAnswer2Column}${answerIndex}`,
+          values: [
+            [
+              `- Type: ${eval1.type}\n- Confidence Level: ${
+                eval1.type === "benign"
+                  ? eval1.benignConfidenceLevel
+                  : eval1.malignantConfidenceLevel
+              }\n- LesionType: ${
+                eval1.type === "benign"
+                  ? eval1.benignLesionType
+                  : eval1.malignantLesionType
+              }`,
+              `- Type: ${eval2.type}\n- Confidence Level: ${
+                eval2.type === "benign"
+                  ? eval2.benignConfidenceLevel
+                  : eval2.malignantConfidenceLevel
+              }\n- Lesion type: ${
+                eval2.type === "benign"
+                  ? eval2.benignLesionType
+                  : eval2.malignantLesionType
+              }\n- AURA Slider bar affect diagnostic: ${
+                eval2.affectDiagnostic
+              }\n- AURA Slider bar affect confidence level : ${
+                eval2.affectConfidenceLevel
+              }`,
+            ],
+          ],
+        },
+      ],
     });
 
     //done all lesion
@@ -137,9 +193,14 @@ export async function POST(req: NextRequest) {
     }
 
     const questions = await getDataInRange({
-      range: `Lesion_Info!A${nextQuestionIndex + 1}:H${nextQuestionIndex + 1}`,
+      range: `Lesion_Info!A${Number(nextQuestionIndex) + 1}:H${
+        Number(nextQuestionIndex) + 1
+      }`,
       spreadsheetId: GOOGLE_DATA_SPREAD_SHEET_ID,
     });
+
+    const nextQuestionIndexInListQuestion =
+      currentAnswer.listLesion.split("|").indexOf(nextQuestionIndex) + 1;
 
     const question = questions.map((item) => {
       return {
@@ -152,8 +213,14 @@ export async function POST(req: NextRequest) {
         lesionAuraResultScreen: get(item, "7", ""),
       };
     });
+
     return NextResponse.json(
-      { nextQuestionIndex, ...question[0] },
+      {
+        nextQuestionIndexInListQuestion,
+        lesionLength: LESION_LENGTH,
+        ...question[0],
+        account,
+      },
       { status: 200 }
     );
   }
