@@ -20,7 +20,7 @@ import {
 import { Image } from "antd";
 import { FileTextOutlined } from "@ant-design/icons";
 import { useRouter } from "next/navigation";
-import LoadingPage from "../component/LoadingPage";
+
 
 const { Option } = Select;
 
@@ -98,96 +98,14 @@ const malignantLesions = [
   {
     value: "malignant1",
     title: "Melanoma",
-    children: [
-      {
-        value: "children 1",
-        title: "Lentigo maligna",
-      },
-      {
-        value: "children 2",
-        title: "Lentigo maligna melanoma",
-      },
-      {
-        value: "children 3",
-        title: "Superficial spreading melanoma",
-      },
-      {
-        value: "children 4",
-        title: "Melanoma in situ",
-      },
-      {
-        value: "children 5",
-        title: "Nodular",
-      },
-      {
-        value: "children 6",
-        title: "Acral lentiginous melanoma",
-      },
-      {
-        value: "children 7",
-        title: "NOS / Other type of MM",
-      },
-    ],
   },
   {
     value: "malignant2",
     title: "Basal Cell Carcinoma (BCC)",
-    children: [
-      {
-        value: "children1",
-        title: "Solid/nodular",
-      },
-      {
-        value: "children2",
-        title: "Multicentric/superficial",
-      },
-      {
-        value: "children3",
-        title: "Pigmented",
-      },
-      {
-        value: "children4",
-        title: "Morpheaform, infiltrating",
-      },
-      {
-        value: "children5",
-        title: "Intraepidermal",
-      },
-      {
-        value: "children6",
-        title: "Fibroepithelial",
-      },
-      {
-        value: "children7",
-        title: "Metatypical",
-      },
-      {
-        value: "children8",
-        title: "Other Type of BCC",
-      },
-    ],
   },
   {
     value: "malignant3",
     title: "Squamous Cell Carcinoma (SCC)",
-    children: [
-      {
-        value: "children11",
-        title: "In situr",
-      },
-      {
-        value: "children22",
-        title: "Invasive/keratinizing",
-      },
-      {
-        value: "children33",
-        title: "Metastatic",
-      },
-      {
-        value: "children44",
-        title: "Other type of SCC",
-      },
-    ],
   },
   {
     value: "malignant4",
