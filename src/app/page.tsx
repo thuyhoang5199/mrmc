@@ -1,6 +1,6 @@
 "use client"; // Add this line to make this a Client Component
 
-import React from "react";
+import React, { useState } from "react";
 import styles from "./page.module.css";
 import type { FormProps } from "antd";
 import { Button, Form, Input, Typography } from "antd";
@@ -14,7 +14,10 @@ type FieldType = {
 export default function Home() {
   const router = useRouter();
   const [form] = Form.useForm();
+  const [isLoading, setIsLoading] = useState(false);
+
   const onFinish: FormProps<FieldType>["onFinish"] = async (values) => {
+    setIsLoading(true);
     const response = await fetch("/api/auth/", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -23,6 +26,7 @@ export default function Home() {
         password: values.password,
       }),
     });
+    setIsLoading(false);
     if (response.ok) {
       router.push("/evaluationForm");
     } else {
@@ -75,8 +79,8 @@ export default function Home() {
             <Input.Password />
           </Form.Item>
 
-          <Button htmlType="submit" className={styles.btn} block>
-            SIGN IN
+          <Button htmlType="submit" className={styles.btn} block loading={isLoading} disabled={isLoading}>
+            {isLoading ? "Signing In..." : "SIGN IN"}
           </Button>
         </Form>
       </main>

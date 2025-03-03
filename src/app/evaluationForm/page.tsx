@@ -15,6 +15,7 @@ import {
   message,
   FloatButton,
   notification,
+  Skeleton,
 } from "antd";
 import { Image } from "antd";
 import { FileTextOutlined } from "@ant-design/icons";
@@ -360,7 +361,7 @@ export default function EvaluationForm() {
 
   // if (isLoading) return <LoadingPage />;
   return (
-    isLoading ? (<LoadingPage />) : (<div className={styles.page}>
+    <div className={styles.page}>
       <div className={styles.container}>
         <Image
           alt="background"
@@ -370,7 +371,7 @@ export default function EvaluationForm() {
         />
         <Fragment>
           <Typography.Title level={3}>
-            MRMC Evaluation - Part {currentData.lesion} of 160
+            MRMC Evaluation - Lesion {currentData.lesion} of 160
           </Typography.Title>
           <Typography.Title level={5}>
             Acc: {questionInfo.doctorName}
@@ -414,7 +415,7 @@ export default function EvaluationForm() {
           {contextHolderNotificationSave}
 
           <Typography className={styles.img_gr}>
-            {currentData.eval === 2 ? (<Image
+            {isLoading ? (<Skeleton.Image active={true} />) : currentData.eval === 2 ? (<Image
               src={`${questionInfo.lesionAuraResultScreen}.jpg`}
               className={styles.img}
             />) : (<div className={styles.note_not_img}>
@@ -425,9 +426,8 @@ export default function EvaluationForm() {
                 <br /> please do not change it.
               </span>
             </div>)}
+            {isLoading ? (<Skeleton.Image active={true} />) : (<Image src={`${questionInfo.lesionPicture}.jpg`} className={styles.img} />)}
 
-
-            <Image src={`${questionInfo.lesionPicture}.jpg`} className={styles.img} />
           </Typography>
 
           <Form.Item
@@ -596,7 +596,7 @@ export default function EvaluationForm() {
               ) : null
             }
           </Form.Item>
-          <Button htmlType="submit" className={styles.btn}>
+          <Button htmlType="submit" className={styles.btn} loading={isLoading} disabled={isLoading}>
             NEXT
           </Button>
         </Form>
@@ -611,6 +611,5 @@ export default function EvaluationForm() {
         />
       </div>
     </div>
-    )
   );
 }

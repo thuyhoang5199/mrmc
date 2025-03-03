@@ -39,12 +39,12 @@ export async function POST(req: Request) {
 
   if (!account || !account.username) {
     return NextResponse.json(
-      { message: "username incorrect" },
+      { message: "Username incorrect" },
       { status: 401 }
     );
   } else if (account.password != password) {
     return NextResponse.json(
-      { message: "password incorrect" },
+      { message: "Password incorrect" },
       { status: 401 }
     );
   }
