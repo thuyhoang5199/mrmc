@@ -29,15 +29,17 @@ const marksBenign: SliderSingleProps["marks"] = {
     style: {
       color: "#086f0f",
       width: "100px",
-      left: "5px",
+      left: "-50px",
+      top: "-42px"
     },
     label: <strong>High confidence Benign</strong>,
   },
   50: {
     style: {
       color: "#9c9006",
-      right: "-10px",
       width: "100px",
+      top: "-42px",
+      transform: "translateX(4%)"
     },
     label: <strong>Low confidence Benign</strong>,
   },
@@ -47,7 +49,8 @@ const marksMalignant: SliderSingleProps["marks"] = {
     style: {
       color: "#9c9006",
       width: "100px",
-      left: "5px",
+      left: "-50px",
+      top: "-42px"
     },
     label: (
       <strong className={styles.note_slide}>Low confidence Malignant </strong>
@@ -56,8 +59,9 @@ const marksMalignant: SliderSingleProps["marks"] = {
   100: {
     style: {
       color: "red",
-      right: "-10px",
       width: "100px",
+      top: "-42px",
+      transform: "translateX(4%)"
     },
     label: (
       <strong className={styles.note_slide}>High confidence Malignant </strong>
@@ -288,7 +292,7 @@ export default function EvaluationForm() {
           className={styles.img_header}
         />
         <Fragment>
-          <Typography.Title level={3}>
+          <Typography.Title level={2}>
             MRMC Evaluation - Lesion {currentData.lesion} of 160
           </Typography.Title>
           <Typography.Title level={5}>
@@ -296,33 +300,33 @@ export default function EvaluationForm() {
           </Typography.Title>
         </Fragment>
         <Divider />
-        <Typography.Title level={4}>
+        <Typography.Title level={3}>
           Please provide your diagnosis for the lesion shown below.
         </Typography.Title>
 
         <Typography className={styles.property_gr}>
-          <Typography.Title level={5} className={styles.property}>
+          <Typography.Title level={4} className={styles.property}>
             Patient&apos;s Age:
           </Typography.Title>
           <Typography.Text className={styles.property_value}>{questionInfo.patientAge}</Typography.Text>
         </Typography>
 
         <Typography className={styles.property_gr}>
-          <Typography.Title level={5} className={styles.property}>
+          <Typography.Title level={4} className={styles.property}>
             Patient&apos;s Gender:
           </Typography.Title>
           <Typography.Text className={styles.property_value}>{questionInfo.patientGender}</Typography.Text>
         </Typography>
 
         <Typography className={styles.property_gr}>
-          <Typography.Title level={5} className={styles.property}>
+          <Typography.Title level={4} className={styles.property}>
             Location of the lesion:
           </Typography.Title>
           <Typography.Text className={styles.property_value}>{questionInfo.lesionLocation}</Typography.Text>
         </Typography>
 
         <Typography className={styles.property_gr}>
-          <Typography.Title level={5} className={styles.property}>
+          <Typography.Title level={4} className={styles.property}>
             Lesion size:
           </Typography.Title>
           <Typography.Text className={styles.property_value}>{questionInfo.lesionSize}</Typography.Text>
@@ -360,6 +364,7 @@ export default function EvaluationForm() {
               allowClear
               onChange={warning}
               className={styles.select_style}
+              dropdownStyle={{ zIndex: 9999 }}
             >
               <Option value="benign">Benign</Option>
               <Option value="malignant">Malignant</Option>
@@ -376,11 +381,15 @@ export default function EvaluationForm() {
                 <>
                   <Form.Item
                     name="confidenceBenign"
-                    label={`Lesion ${currentData.lesion} of 160: Benign Diagnosis - Confidence Level`}
+                    label=""
                     rules={[{ required: true, message: "" }]}
                     labelCol={{ span: 24 }}
                     wrapperCol={{ span: 24 }}
+                    className={styles.form_item}
                   >
+                    <label className={styles.label_item}> {/* Direct label styling */}
+                      <span style={{ color: "red" }}>*</span> Lesion {currentData.lesion} of 160: Benign Diagnosis - Confidence Level
+                    </label>
                     <Slider
                       marks={marksBenign}
                       min={1}
@@ -392,52 +401,66 @@ export default function EvaluationForm() {
                   </Form.Item>
                   <Form.Item
                     name="lesionBenign"
-                    label={`Lesion ${currentData.lesion} of 160: Benign Diagnosis - Lesion Type`}
+                    label=""
                     rules={[
                       { required: true, message: "This field is required" },
                     ]}
                     labelCol={{ span: 24 }}
                     wrapperCol={{ span: 24 }}
                     valuePropName="select"
+                    className={styles.form_item}
                   >
+                    <label className={styles.label_item}> {/* Direct label styling */}
+                      <span style={{ color: "red" }}>*</span> Lesion {currentData.lesion} of 160: Benign Diagnosis - Lesion Type
+                    </label>
                     <TreeSelect
                       showSearch
-                      style={{ width: "100%" }}
+                      style={{ width: "100%", marginTop: "15px" }}
                       dropdownStyle={{ maxHeight: 400, overflow: "auto", zIndex: 9999, }}
                       placeholder="Please select"
                       allowClear
                       // treeDefaultExpandAll
                       treeData={processTreeData(benignLesions)}
+
                     />
                   </Form.Item>
-                  {currentData.eval === 2 ? (<><Form.Item
-                    name="checkBenign "
-                    label="Did the AURA Slider bar position affect your diagnostic decision?"
-                    rules={[
-                      { required: true, message: "This field is required" },
-                    ]}
-                    labelCol={{ span: 24 }}
-                    wrapperCol={{ span: 24 }}
-                  >
-                    <Radio.Group>
-                      <Radio value="yes">Yes</Radio>
-                      <Radio value="no">No</Radio>
-                    </Radio.Group>
-                  </Form.Item>
-
+                  {currentData.eval === 2 ? (<>
                     <Form.Item
-                      name="confidenceBenignCheck"
-                      label="Did the AURA slider bar position affect the confidence level of your decision?"
+                      name="checkBenign "
+                      label=""
                       rules={[
                         { required: true, message: "This field is required" },
                       ]}
                       labelCol={{ span: 24 }}
                       wrapperCol={{ span: 24 }}
+                      className={styles.form_item}
                     >
-                      <Radio.Group>
-                        <Radio value="MoreConfident">More confident</Radio>
-                        <Radio value="LessConfident">Less confident</Radio>
-                        <Radio value="NoEffect">No effect</Radio>
+                      <label className={styles.label_item}> {/* Direct label styling */}
+                        <span style={{ color: "red" }}>*</span> Did the AURA Slider bar position affect your diagnostic decision? <br />
+                      </label>
+                      <Radio.Group style={{ marginTop: "15px" }}>
+                        <Radio value="yes" style={{ fontSize: "16px" }}>Yes</Radio>
+                        <Radio value="no" style={{ fontSize: "16px" }}>No</Radio>
+                      </Radio.Group>
+                    </Form.Item>
+
+                    <Form.Item
+                      name="confidenceBenignCheck"
+                      label=""
+                      rules={[
+                        { required: true, message: "This field is required" },
+                      ]}
+                      labelCol={{ span: 24 }}
+                      wrapperCol={{ span: 24 }}
+                      className={styles.form_item}
+                    >
+                      <label className={styles.label_item}> {/* Direct label styling */}
+                        <span style={{ color: "red" }}>*</span> Did the AURA slider bar position affect the confidence level of your decision? <br />
+                      </label>
+                      <Radio.Group style={{ marginTop: "15px" }}>
+                        <Radio value="MoreConfident" style={{ fontSize: "16px" }}>More confident</Radio>
+                        <Radio value="LessConfident" style={{ fontSize: "16px" }}>Less confident</Radio>
+                        <Radio value="NoEffect" style={{ fontSize: "16px" }}>No effect</Radio>
                       </Radio.Group>
                     </Form.Item></>) : null}
                 </>
@@ -445,11 +468,15 @@ export default function EvaluationForm() {
                 <>
                   <Form.Item
                     name="confidenceMalignant"
-                    label={`Lesion ${currentData.lesion} of 160: Malignant Diagnosis - Confidence Level`}
+                    label=""
                     rules={[{ required: true, message: "" }]}
                     labelCol={{ span: 24 }}
                     wrapperCol={{ span: 24 }}
+                    className={styles.form_item}
                   >
+                    <label className={styles.label_item}> {/* Direct label styling */}
+                      <span style={{ color: "red" }}>*</span> Lesion {currentData.lesion} of 160: Malignant Diagnosis - Confidence Level
+                    </label>
                     <Slider
                       marks={marksMalignant}
                       min={51}
@@ -461,17 +488,21 @@ export default function EvaluationForm() {
                   </Form.Item>
                   <Form.Item
                     name="lesionMalignant"
-                    label={`Lesion ${currentData.lesion} of 160: Malignant Diagnosis - Lesion Type`}
+                    label=""
                     rules={[
                       { required: true, message: "This field is required" },
                     ]}
                     labelCol={{ span: 24 }}
                     wrapperCol={{ span: 24 }}
                     valuePropName="select"
+                    className={styles.form_item}
                   >
+                    <label className={styles.label_item}> {/* Direct label styling */}
+                      <span style={{ color: "red" }}>*</span> Lesion {currentData.lesion} of 160: Malignant Diagnosis - Lesion Type
+                    </label>
                     <TreeSelect
                       showSearch
-                      style={{ width: "100%" }}
+                      style={{ width: "100%", marginTop: "15px" }}
                       dropdownStyle={{ maxHeight: 400, overflow: "auto", zIndex: 9999, }}
                       placeholder="Please select"
                       allowClear
@@ -479,37 +510,45 @@ export default function EvaluationForm() {
                       treeData={processTreeData(malignantLesions)}
                     />
                   </Form.Item>
-                  {currentData.eval === 2 ? (<><Form.Item
-                    name="checkMalignant"
-                    label="Did the AURA Slider bar position affect your diagnostic decision?"
-                    rules={[
-                      { required: true, message: "This field is required" },
-                    ]}
-                    labelCol={{ span: 24 }}
-                    wrapperCol={{ span: 24 }}
-                  >
-                    <Radio.Group>
-                      <Radio value="yes">Yes</Radio>
-                      <Radio value="no">No</Radio>
-                    </Radio.Group>
-                  </Form.Item>
-
+                  {currentData.eval === 2 ? (<>
                     <Form.Item
-                      name="confidenceMalignantCheck"
-                      label="Did the AURA slider bar position affect the confidence level of your decision?"
+                      name="checkBenign "
+                      label=""
                       rules={[
                         { required: true, message: "This field is required" },
                       ]}
                       labelCol={{ span: 24 }}
                       wrapperCol={{ span: 24 }}
+                      className={styles.form_item}
                     >
-                      <Radio.Group>
-                        <Radio value="MoreConfident">More confident</Radio>
-                        <Radio value="LessConfident">Less confident</Radio>
-                        <Radio value="NoEffect">No effect</Radio>
+                      <label className={styles.label_item}> {/* Direct label styling */}
+                        <span style={{ color: "red" }}>*</span> Did the AURA Slider bar position affect your diagnostic decision? <br />
+                      </label>
+                      <Radio.Group style={{ marginTop: "15px" }}>
+                        <Radio value="yes" style={{ fontSize: "16px" }}>Yes</Radio>
+                        <Radio value="no" style={{ fontSize: "16px" }}>No</Radio>
+                      </Radio.Group>
+                    </Form.Item>
+
+                    <Form.Item
+                      name="confidenceBenignCheck"
+                      label=""
+                      rules={[
+                        { required: true, message: "This field is required" },
+                      ]}
+                      labelCol={{ span: 24 }}
+                      wrapperCol={{ span: 24 }}
+                      className={styles.form_item}
+                    >
+                      <label className={styles.label_item}> {/* Direct label styling */}
+                        <span style={{ color: "red" }}>*</span> Did the AURA slider bar position affect the confidence level of your decision? <br />
+                      </label>
+                      <Radio.Group style={{ marginTop: "15px" }}>
+                        <Radio value="MoreConfident" style={{ fontSize: "16px" }}>More confident</Radio>
+                        <Radio value="LessConfident" style={{ fontSize: "16px" }}>Less confident</Radio>
+                        <Radio value="NoEffect" style={{ fontSize: "16px" }}>No effect</Radio>
                       </Radio.Group>
                     </Form.Item></>) : null}
-
                 </>
               ) : null
             }
