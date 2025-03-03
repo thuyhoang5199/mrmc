@@ -16,6 +16,7 @@ import {
   FloatButton,
   notification,
   Skeleton,
+  Statistic
 } from "antd";
 import { Image } from "antd";
 import { FileTextOutlined } from "@ant-design/icons";
@@ -135,6 +136,7 @@ export default function EvaluationForm() {
 
   const [messageApi, contextHolder] = message.useMessage();
   const [api, contextHolderNotificationSave] = notification.useNotification();
+  const [deadline, setDeadline] = useState(Date.now())
 
   const [isLoading, setIsLoading] = useState(false);
   const [questionInfo, setQuestionInfo] = useState({
@@ -194,6 +196,7 @@ export default function EvaluationForm() {
       })
       .finally(() => {
         setIsLoading(false);
+        setDeadline(Date.now() + 1000 * 60)
       });
   }, []);
 
@@ -213,6 +216,7 @@ export default function EvaluationForm() {
         eval2: null, // Default object for eval2
       })
     }
+    setDeadline(Date.now() + 1000 * 60)
   }
 
   const onFinish = (values: unknown) => {
@@ -396,7 +400,9 @@ export default function EvaluationForm() {
                       min={1}
                       max={50}
                       step={1}
-                      tooltip={{ open: true }}
+                      tooltip={{
+                        open: true,
+                      }}
                       className={styles.slider_style}
                     />
                   </Form.Item>
@@ -568,9 +574,13 @@ export default function EvaluationForm() {
           icon={<FileTextOutlined />}
           description="SAVE"
           type="primary"
-          // shape="circle"
           style={{ insetInlineEnd: 14, height: 50, width: 50 }}
           onClick={openNotificationWithIcon}
+          shape="square"
+        />
+        <FloatButton
+          description={<Statistic.Countdown value={deadline} format="mm:ss" valueStyle={{ fontSize: "14px", fontWeight: "600", color: "red" }} />}
+          style={{ insetInlineEnd: 70, height: 50, width: 50 }}
           shape="square"
         />
       </div>

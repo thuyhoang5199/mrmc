@@ -63,7 +63,7 @@
 }
 
 .slider_style {
- margin: 55px 90px 18px !important;
+ margin: 45px 90px 18px !important;
 
 }
 
@@ -96,7 +96,7 @@
 }
 
 .select_style {
-  margin: 15px 0px !important;
+  margin: 15px 0px 0px !important;
 }
 @media (max-width: 1200px) {
   .img{
