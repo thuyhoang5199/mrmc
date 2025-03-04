@@ -16,9 +16,10 @@ import {
   notification,
   Skeleton,
   Statistic,
+  Modal,
 } from "antd";
 import { Image } from "antd";
-import { FileTextOutlined } from "@ant-design/icons";
+import { FileTextOutlined, LogoutOutlined } from "@ant-design/icons";
 import { useRouter } from "next/navigation";
 import LoadingPage from "../component/LoadingPage";
 
@@ -129,8 +130,10 @@ export default function EvaluationForm() {
 
   const [messageApi, contextHolder] = message.useMessage();
   const [api, contextHolderNotificationSave] = notification.useNotification();
-  const [deadline, setDeadline] = useState(Date.now());
+  const [notificationClient] = notification.useNotification();
 
+  const [deadline, setDeadline] = useState(Date.now());
+  const [isLogoutOpen, setIsLogoutOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [questionInfo, setQuestionInfo] = useState({
     nextQuestionIndex: 1,
@@ -267,6 +270,21 @@ export default function EvaluationForm() {
       message: "Save Success",
       description: "Your evaluation process has been saved successfully.",
     });
+  };
+
+  const logout = () => {
+    fetch("/api/auth/logout", { method: "POST", body: "{}" })
+      .then(async () => {
+        router.replace("/");
+      })
+      .catch(async (e) => {
+        const data = await e.json();
+
+        notificationClient.error({
+          message: "Get Data Error",
+          description: data.message,
+        });
+      });
   };
 
   return (
@@ -663,25 +681,36 @@ export default function EvaluationForm() {
             NEXT
           </Button>
         </Form>
-        <FloatButton
-          icon={<FileTextOutlined />}
-          description="SAVE"
-          type="primary"
-          style={{ insetInlineEnd: 14, height: 50, width: 50 }}
-          onClick={openNotificationWithIcon}
+        <FloatButton.Group open={true}
           shape="square"
-        />
-        <FloatButton
-          description={
-            <Statistic.Countdown
-              value={deadline}
-              format="mm:ss"
-              valueStyle={{ fontSize: "14px", fontWeight: "600", color: "red" }}
-            />
-          }
-          style={{ insetInlineEnd: 70, height: 50, width: 50 }}
-          shape="square"
-        />
+          style={{ insetInlineEnd: 24 }}
+        >
+          <FloatButton
+            description={
+              <Statistic.Countdown
+                value={deadline}
+                format="mm:ss"
+                valueStyle={{ fontSize: "14px", fontWeight: "600", color: "red" }}
+              />
+            }
+            shape="square"
+            className={styles.btn_float}
+          />
+          <FloatButton
+
+            description={
+              <span><FileTextOutlined style={{ color: "#075f85", fontSize: "16px" }} /><br /><span style={{ color: "#075f85", fontWeight: "600" }}>SAVE</span></span>
+            }
+            onClick={openNotificationWithIcon}
+            shape="square"
+            className={styles.btn_float}
+          />
+          <FloatButton icon={<LogoutOutlined />} shape="square" className={styles.btn_float} tooltip={<div>SIGN OUT</div>} onClick={() => { setIsLogoutOpen(true) }} />
+        </FloatButton.Group>
+        <Modal title="SIGN OUT" open={isLogoutOpen} onOk={logout} onCancel={() => { setIsLogoutOpen(false) }} style={{ width: "100px" }}>
+          <p>When you log out, the evaluation results will be saved.</p>
+        </Modal>
+
       </div>
       {isLoading && <LoadingPage />}
     </div>

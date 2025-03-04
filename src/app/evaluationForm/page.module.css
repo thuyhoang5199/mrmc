@@ -98,6 +98,12 @@
 .select_style {
   margin: 15px 0px 0px !important;
 }
+
+.btn_float {
+  width: 50px !important;
+  height: 50px !important;
+}
+
 @media (max-width: 1200px) {
   .img{
     height: 250px!important ;
