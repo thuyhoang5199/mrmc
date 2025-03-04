@@ -55,11 +55,12 @@ a {
   display: flex;
   justify-content: center;
   align-items: center;
+  opacity: 0.75;
 }
 
 .ant-tooltip-inner {
   color: #fff !important;
-  background-color: #067DB2 !important;
+  background-color: #067db2 !important;
   min-height: unset !important;
   font-size: 12px !important;
   padding: 2px 7px !important;
@@ -67,5 +68,5 @@ a {
 }
 
 .ant-tooltip-arrow::before {
-  background-color: #067DB2 !important;
+  background-color: #067db2 !important;
 }

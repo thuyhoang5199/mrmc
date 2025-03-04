@@ -10,20 +10,17 @@ import {
   Select,
   SliderSingleProps,
   Slider,
-  TreeSelect,
   Radio,
   message,
   FloatButton,
   notification,
   Skeleton,
-  Statistic
+  Statistic,
 } from "antd";
 import { Image } from "antd";
 import { FileTextOutlined } from "@ant-design/icons";
 import { useRouter } from "next/navigation";
-
-
-const { Option } = Select;
+import LoadingPage from "../component/LoadingPage";
 
 const marksBenign: SliderSingleProps["marks"] = {
   1: {
@@ -31,7 +28,7 @@ const marksBenign: SliderSingleProps["marks"] = {
       color: "#086f0f",
       width: "100px",
       left: "-50px",
-      top: "-42px"
+      top: "-42px",
     },
     label: <strong>High confidence Benign</strong>,
   },
@@ -40,7 +37,7 @@ const marksBenign: SliderSingleProps["marks"] = {
       color: "#9c9006",
       width: "100px",
       top: "-42px",
-      transform: "translateX(4%)"
+      transform: "translateX(4%)",
     },
     label: <strong>Low confidence Benign</strong>,
   },
@@ -51,7 +48,7 @@ const marksMalignant: SliderSingleProps["marks"] = {
       color: "#9c9006",
       width: "100px",
       left: "-50px",
-      top: "-42px"
+      top: "-42px",
     },
     label: (
       <strong className={styles.note_slide}>Low confidence Malignant </strong>
@@ -62,7 +59,7 @@ const marksMalignant: SliderSingleProps["marks"] = {
       color: "red",
       width: "100px",
       top: "-42px",
-      transform: "translateX(4%)"
+      transform: "translateX(4%)",
     },
     label: (
       <strong className={styles.note_slide}>High confidence Malignant </strong>
@@ -72,59 +69,55 @@ const marksMalignant: SliderSingleProps["marks"] = {
 
 const benignLesions = [
   {
-    value: "benign 1",
-    title: "Seborrheic Keratosis (SK)",
-
+    value: "Seborrheic Keratosis (SK)",
+    label: "Seborrheic Keratosis (SK)",
   },
   {
-    value: "benign 2",
-    title: "Nevus",
-
+    value: "Nevus",
+    label: "Nevus",
   },
   {
-    value: "benign 3",
-    title: "Dermatofibroma",
-
+    value: "Dermatofibroma",
+    label: "Dermatofibroma",
   },
   {
-    value: "benign 4",
-    title: "Warts",
+    value: "Warts",
+    label: "Warts",
   },
   {
-    value: "benign 5",
-    title: "Sebaceous Hyperplasia",
+    value: "Sebaceous Hyperplasia",
+    label: "Sebaceous Hyperplasia",
   },
   {
-    value: "benign 6",
-    title: " Other benign lesions",
+    value: "Other benign lesions",
+    label: "Other benign lesions",
   },
 ];
 const malignantLesions = [
   {
-    value: "malignant1",
-    title: "Melanoma",
+    value: "Melanoma",
+    label: "Melanoma",
   },
   {
-    value: "malignant2",
-    title: "Basal Cell Carcinoma (BCC)",
+    value: "Basal Cell Carcinoma (BCC)",
+    label: "Basal Cell Carcinoma (BCC)",
   },
   {
-    value: "malignant3",
-    title: "Squamous Cell Carcinoma (SCC)",
+    value: "Squamous Cell Carcinoma (SCC)",
+    label: "Squamous Cell Carcinoma (SCC)",
   },
   {
-    value: "malignant4",
-    title: "Actinic Keratosis (AK)",
+    value: "Actinic Keratosis (AK)",
+    label: "Actinic Keratosis (AK)",
   },
   {
-    value: "malignant5",
-    title: "Other Malignant Lesions",
+    value: "Other Malignant Lesions",
+    label: "Other Malignant Lesions",
   },
 ];
 
 // Define the type of currentData
 interface CurrentData {
-  lesion: number;
   eval: number;
   eval1: unknown; // eval1 as an object or null
   eval2: unknown; // eval2 as an object or null
@@ -136,7 +129,7 @@ export default function EvaluationForm() {
 
   const [messageApi, contextHolder] = message.useMessage();
   const [api, contextHolderNotificationSave] = notification.useNotification();
-  const [deadline, setDeadline] = useState(Date.now())
+  const [deadline, setDeadline] = useState(Date.now());
 
   const [isLoading, setIsLoading] = useState(false);
   const [questionInfo, setQuestionInfo] = useState({
@@ -149,10 +142,15 @@ export default function EvaluationForm() {
     lesionAuraResultScreen: null,
     lesionId: null,
     doctorName: "",
+    nextQuestionIndexInListQuestion: 0,
+    lesionLength: 0,
+    account: {
+      id: "",
+      name: "",
+    },
   });
 
   const [currentData, setCurrentData] = useState<CurrentData>({
-    lesion: 1,
     eval: 1,
     eval1: null, // Default object for eval1
     eval2: null, // Default object for eval2
@@ -160,8 +158,8 @@ export default function EvaluationForm() {
 
   // Fetch data from localStorage when the component mounts
   useEffect(() => {
-    if (typeof window !== 'undefined') {
-      const storedData = localStorage.getItem('currentData');
+    if (typeof window !== "undefined") {
+      const storedData = localStorage.getItem("currentData");
       if (storedData) {
         setCurrentData(JSON.parse(storedData));
       }
@@ -170,11 +168,10 @@ export default function EvaluationForm() {
 
   // Sync the currentData with localStorage whenever it changes
   useEffect(() => {
-    if (typeof window !== 'undefined') {
-      localStorage.setItem('currentData', JSON.stringify(currentData));
+    if (typeof window !== "undefined") {
+      localStorage.setItem("currentData", JSON.stringify(currentData));
     }
   }, [currentData]); // This will run whenever currentData changes
-
 
   useEffect(() => {
     setIsLoading(true);
@@ -183,8 +180,9 @@ export default function EvaluationForm() {
         const data = await res.json();
         if (data?.successAll) {
           router.replace("/result");
+        } else {
+          setQuestionInfo(data);
         }
-        setQuestionInfo(data);
       })
       .catch(async (e) => {
         const data = await e.json();
@@ -196,27 +194,30 @@ export default function EvaluationForm() {
       })
       .finally(() => {
         setIsLoading(false);
-        setDeadline(Date.now() + 1000 * 60)
+        setDeadline(Date.now() + 1000 * 60);
       });
   }, []);
-
 
   const onSubmit = (values: unknown) => {
     if (currentData.eval === 1) {
       setCurrentData({
-        ...currentData, eval: 2, eval1: values
-      })
-      form.resetFields()
+        ...currentData,
+        eval: 2,
+        eval1: values,
+      });
+      form.resetFields();
     } else {
-      onFinish(values)
+      onFinish({
+        eval1: currentData.eval1,
+        eval2: values,
+      });
       setCurrentData({
-        lesion: currentData.lesion + 1,
         eval: 1,
         eval1: null, // Default object for eval1
         eval2: null, // Default object for eval2
-      })
+      });
     }
-  }
+  };
 
   const onFinish = (values: unknown) => {
     setIsLoading(true);
@@ -230,11 +231,10 @@ export default function EvaluationForm() {
         if (data?.successAll) {
           router.replace("/result");
           setCurrentData({
-            lesion: 1,
             eval: 1,
             eval1: null, // Default object for eval1
             eval2: null, // Default object for eval2
-          })
+          });
         }
         setQuestionInfo(data);
         form.resetFields();
@@ -248,10 +248,9 @@ export default function EvaluationForm() {
       })
       .finally(() => {
         setIsLoading(false);
-        setDeadline(Date.now() + 1000 * 60)
+        setDeadline(Date.now() + 1000 * 60);
       });
   };
-
 
   const warning = (value: string) => {
     if (value) {
@@ -263,21 +262,6 @@ export default function EvaluationForm() {
     }
   };
 
-  // Recursively disable parent nodes that are not leaves
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const processTreeData = (data: any) => {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    return data.map((node: any) => {
-      if (node.children) {
-        return {
-          ...node,
-          disabled: true, // Disable parent node
-          children: processTreeData(node.children), // Recursively process children
-        };
-      }
-      return node;
-    });
-  };
   const openNotificationWithIcon = () => {
     api.success({
       message: "Save Success",
@@ -285,7 +269,6 @@ export default function EvaluationForm() {
     });
   };
 
-  // if (isLoading) return <LoadingPage />;
   return (
     <div className={styles.page}>
       <div className={styles.container}>
@@ -297,10 +280,15 @@ export default function EvaluationForm() {
         />
         <Fragment>
           <Typography.Title level={2}>
-            MRMC Evaluation - Lesion {currentData.lesion} of 160
+            MRMC Evaluation - Lesion{" "}
+            {questionInfo.nextQuestionIndexInListQuestion} of{" "}
+            {questionInfo.lesionLength}
           </Typography.Title>
           <Typography.Title level={5}>
-            Acc: {questionInfo.doctorName}
+            Doctor Id: {questionInfo.account.id}
+          </Typography.Title>
+          <Typography.Title level={5}>
+            Doctor Name: {questionInfo.account.name}
           </Typography.Title>
         </Fragment>
         <Divider />
@@ -312,52 +300,82 @@ export default function EvaluationForm() {
           <Typography.Title level={4} className={styles.property}>
             Patient&apos;s Age:
           </Typography.Title>
-          <Typography.Text className={styles.property_value}>{questionInfo.patientAge}</Typography.Text>
+          <Typography.Text className={styles.property_value}>
+            {questionInfo.patientAge}
+          </Typography.Text>
         </Typography>
 
         <Typography className={styles.property_gr}>
           <Typography.Title level={4} className={styles.property}>
             Patient&apos;s Gender:
           </Typography.Title>
-          <Typography.Text className={styles.property_value}>{questionInfo.patientGender}</Typography.Text>
+          <Typography.Text className={styles.property_value}>
+            {questionInfo.patientGender}
+          </Typography.Text>
         </Typography>
 
         <Typography className={styles.property_gr}>
           <Typography.Title level={4} className={styles.property}>
             Location of the lesion:
           </Typography.Title>
-          <Typography.Text className={styles.property_value}>{questionInfo.lesionLocation}</Typography.Text>
+          <Typography.Text className={styles.property_value}>
+            {questionInfo.lesionLocation}
+          </Typography.Text>
         </Typography>
 
         <Typography className={styles.property_gr}>
           <Typography.Title level={4} className={styles.property}>
             Lesion size:
           </Typography.Title>
-          <Typography.Text className={styles.property_value}>{questionInfo.lesionSize}</Typography.Text>
+          <Typography.Text className={styles.property_value}>
+            {questionInfo.lesionSize}
+          </Typography.Text>
         </Typography>
 
-        <Form onFinish={onSubmit} form={form} className={styles.form_style} initialValues={{ confidenceBenign: "1", confidenceMalignant: "51" }}>
+        <Form
+          onFinish={onSubmit}
+          form={form}
+          className={styles.form_style}
+          initialValues={{
+            benignConfidenceLevel: "1",
+            malignantConfidenceLevel: "51",
+          }}
+        >
           {contextHolder}
           {contextHolderNotificationSave}
 
           <Typography className={styles.img_gr}>
-            {isLoading ? (<Skeleton.Image active={true} />) : currentData.eval === 2 ? (<Image
-              src={`${questionInfo.lesionAuraResultScreen}.jpg`}
-              className={styles.img}
-            />) : (<div className={styles.note_not_img}>
-              <span>
-                Please do not zoom the lesion picture in or out.
-                <br />
-                The default web zoom setting is at 100%,
-                <br /> please do not change it.
-              </span>
-            </div>)}
-            {isLoading ? (<Skeleton.Image active={true} />) : (<Image src={`${questionInfo.lesionPicture}.jpg`} className={styles.img} />)}
-
+            {isLoading ? (
+              <Skeleton.Image active={true} />
+            ) : currentData.eval === 2 ? (
+              <Image
+                alt=""
+                src={`${questionInfo.lesionAuraResultScreen}.jpg`}
+                className={styles.img}
+              />
+            ) : (
+              <div className={styles.note_not_img}>
+                <span>
+                  Please do not zoom the lesion picture in or out.
+                  <br />
+                  The default web zoom setting is at 100%,
+                  <br /> please do not change it.
+                </span>
+              </div>
+            )}
+            {isLoading ? (
+              <Skeleton.Image active={true} />
+            ) : (
+              <Image
+                alt=""
+                src={`${questionInfo.lesionPicture}.jpg`}
+                className={styles.img}
+              />
+            )}
           </Typography>
 
           <Form.Item
-            name="choose"
+            name="type"
             label=""
             rules={[{ required: true, message: "This field is required" }]}
             className={styles.form_item}
@@ -369,32 +387,44 @@ export default function EvaluationForm() {
               onChange={warning}
               className={styles.select_style}
               dropdownStyle={{ zIndex: 9999 }}
-            >
-              <Option value="benign">Benign</Option>
-              <Option value="malignant">Malignant</Option>
-            </Select>
+              size="large"
+              options={[
+                {
+                  value: "benign",
+                  label: "Benign",
+                },
+                {
+                  value: "malignant",
+                  label: "Malignant",
+                },
+              ]}
+            />
           </Form.Item>
           <Form.Item
             noStyle
             shouldUpdate={(prevValues, currentValues) =>
-              prevValues.choose !== currentValues.choose
+              prevValues.type !== currentValues.type
             }
           >
             {({ getFieldValue }) =>
-              getFieldValue("choose") === "benign" ? (
+              getFieldValue("type") === "benign" ? (
                 <>
-                  <label className={styles.label_item}> {/* Direct label styling */}
-                    <span style={{ color: "red" }}>*</span> Lesion {currentData.lesion} of 160: Benign Diagnosis - Confidence Level
+                  <label className={styles.label_item}>
+                    {" "}
+                    {/* Direct label styling */}
+                    <span style={{ color: "red" }}>*</span> Lesion{" "}
+                    {questionInfo.nextQuestionIndexInListQuestion} of{" "}
+                    {questionInfo.lesionLength}: Benign Diagnosis - Confidence
+                    Level
                   </label>
                   <Form.Item
-                    name="confidenceBenign"
+                    name="benignConfidenceLevel"
                     label=""
                     rules={[{ required: true, message: "" }]}
                     labelCol={{ span: 24 }}
                     wrapperCol={{ span: 24 }}
                     className={styles.form_item}
                   >
-
                     <Slider
                       marks={marksBenign}
                       min={1}
@@ -407,11 +437,15 @@ export default function EvaluationForm() {
                     />
                   </Form.Item>
 
-                  <label className={styles.label_item}> {/* Direct label styling */}
-                    <span style={{ color: "red" }}>*</span> Lesion {currentData.lesion} of 160: Benign Diagnosis - Lesion Type
+                  <label className={styles.label_item}>
+                    {" "}
+                    {/* Direct label styling */}
+                    <span style={{ color: "red" }}>*</span> Lesion{" "}
+                    {questionInfo.nextQuestionIndexInListQuestion} of{" "}
+                    {questionInfo.lesionLength}: Benign Diagnosis - Lesion Type
                   </label>
                   <Form.Item
-                    name="lesionBenign"
+                    name="benignLesionType"
                     label=""
                     rules={[
                       { required: true, message: "This field is required" },
@@ -421,73 +455,100 @@ export default function EvaluationForm() {
                     valuePropName="select"
                     className={styles.form_item}
                   >
-
-                    <TreeSelect
-                      showSearch
-                      style={{ width: "100%", marginTop: "10px" }}
-                      dropdownStyle={{ maxHeight: 400, overflow: "auto", zIndex: 9999, }}
-                      placeholder="Please select"
+                    <Select
+                      placeholder="Choose"
                       allowClear
-                      // treeDefaultExpandAll
-                      treeData={processTreeData(benignLesions)}
-
+                      className={styles.select_style}
+                      dropdownStyle={{ zIndex: 9999 }}
+                      options={benignLesions}
+                      size="large"
                     />
                   </Form.Item>
-                  {currentData.eval === 2 ? (<>
-                    <label className={styles.label_item}> {/* Direct label styling */}
-                      <span style={{ color: "red" }}>*</span> Did the AURA Slider bar position affect your diagnostic decision? <br />
-                    </label>
-                    <Form.Item
-                      name="checkBenign "
-                      label=""
-                      rules={[
-                        { required: true, message: "This field is required" },
-                      ]}
-                      labelCol={{ span: 24 }}
-                      wrapperCol={{ span: 24 }}
-                      className={styles.form_item}
-                    >
+                  {currentData.eval === 2 ? (
+                    <>
+                      <label className={styles.label_item}>
+                        {" "}
+                        {/* Direct label styling */}
+                        <span style={{ color: "red" }}>*</span> Did the AURA
+                        Slider bar position affect your diagnostic decision?{" "}
+                        <br />
+                      </label>
+                      <Form.Item
+                        name="affectDiagnostic"
+                        label=""
+                        rules={[
+                          { required: true, message: "This field is required" },
+                        ]}
+                        labelCol={{ span: 24 }}
+                        wrapperCol={{ span: 24 }}
+                        className={styles.form_item}
+                      >
+                        <Radio.Group style={{ marginTop: "10px" }}>
+                          <Radio value="yes" style={{ fontSize: "16px" }}>
+                            Yes
+                          </Radio>
+                          <Radio value="no" style={{ fontSize: "16px" }}>
+                            No
+                          </Radio>
+                        </Radio.Group>
+                      </Form.Item>
 
-                      <Radio.Group style={{ marginTop: "10px" }}>
-                        <Radio value="yes" style={{ fontSize: "16px" }}>Yes</Radio>
-                        <Radio value="no" style={{ fontSize: "16px" }}>No</Radio>
-                      </Radio.Group>
-                    </Form.Item>
-
-                    <label className={styles.label_item}> {/* Direct label styling */}
-                      <span style={{ color: "red" }}>*</span> Did the AURA slider bar position affect the confidence level of your decision? <br />
-                    </label>
-                    <Form.Item
-                      name="confidenceBenignCheck"
-                      label=""
-                      rules={[
-                        { required: true, message: "This field is required" },
-                      ]}
-                      labelCol={{ span: 24 }}
-                      wrapperCol={{ span: 24 }}
-                      className={styles.form_item}
-                    >
-                      <Radio.Group style={{ marginTop: "10px" }}>
-                        <Radio value="MoreConfident" style={{ fontSize: "16px" }}>More confident</Radio>
-                        <Radio value="LessConfident" style={{ fontSize: "16px" }}>Less confident</Radio>
-                        <Radio value="NoEffect" style={{ fontSize: "16px" }}>No effect</Radio>
-                      </Radio.Group>
-                    </Form.Item></>) : null}
+                      <label className={styles.label_item}>
+                        {" "}
+                        {/* Direct label styling */}
+                        <span style={{ color: "red" }}>*</span> Did the AURA
+                        slider bar position affect the confidence level of your
+                        decision? <br />
+                      </label>
+                      <Form.Item
+                        name="affectConfidenceLevel"
+                        label=""
+                        rules={[
+                          { required: true, message: "This field is required" },
+                        ]}
+                        labelCol={{ span: 24 }}
+                        wrapperCol={{ span: 24 }}
+                        className={styles.form_item}
+                      >
+                        <Radio.Group style={{ marginTop: "10px" }}>
+                          <Radio
+                            value="MoreConfident"
+                            style={{ fontSize: "16px" }}
+                          >
+                            More confident
+                          </Radio>
+                          <Radio
+                            value="LessConfident"
+                            style={{ fontSize: "16px" }}
+                          >
+                            Less confident
+                          </Radio>
+                          <Radio value="NoEffect" style={{ fontSize: "16px" }}>
+                            No effect
+                          </Radio>
+                        </Radio.Group>
+                      </Form.Item>
+                    </>
+                  ) : null}
                 </>
-              ) : getFieldValue("choose") === "malignant" ? (
+              ) : getFieldValue("type") === "malignant" ? (
                 <>
-                  <label className={styles.label_item}> {/* Direct label styling */}
-                    <span style={{ color: "red" }}>*</span> Lesion {currentData.lesion} of 160: Malignant Diagnosis - Confidence Level
+                  <label className={styles.label_item}>
+                    {" "}
+                    {/* Direct label styling */}
+                    <span style={{ color: "red" }}>*</span> Lesion{" "}
+                    {questionInfo.nextQuestionIndexInListQuestion} of{" "}
+                    {questionInfo.lesionLength}: Malignant Diagnosis -
+                    Confidence Level
                   </label>
                   <Form.Item
-                    name="confidenceMalignant"
+                    name="malignantConfidenceLevel"
                     label=""
                     rules={[{ required: true, message: "" }]}
                     labelCol={{ span: 24 }}
                     wrapperCol={{ span: 24 }}
                     className={styles.form_item}
                   >
-
                     <Slider
                       marks={marksMalignant}
                       min={51}
@@ -497,11 +558,15 @@ export default function EvaluationForm() {
                       className={styles.slider_style}
                     />
                   </Form.Item>
-                  <label className={styles.label_item}> {/* Direct label styling */}
-                    <span style={{ color: "red" }}>*</span> Lesion {currentData.lesion} of 160: Malignant Diagnosis - Lesion Type
+                  <label className={styles.label_item}>
+                    {/* Direct label styling */}
+                    <span style={{ color: "red" }}>*</span> Lesion{" "}
+                    {questionInfo.nextQuestionIndexInListQuestion} of{" "}
+                    {questionInfo.lesionLength}: Malignant Diagnosis - Lesion
+                    Type
                   </label>
                   <Form.Item
-                    name="lesionMalignant"
+                    name="malignantLesionType"
                     label=""
                     rules={[
                       { required: true, message: "This field is required" },
@@ -511,62 +576,90 @@ export default function EvaluationForm() {
                     valuePropName="select"
                     className={styles.form_item}
                   >
-
-                    <TreeSelect
-                      showSearch
-                      style={{ width: "100%", marginTop: "10px" }}
-                      dropdownStyle={{ maxHeight: 400, overflow: "auto", zIndex: 9999, }}
-                      placeholder="Please select"
+                    <Select
+                      placeholder="Choose"
                       allowClear
-                      // treeDefaultExpandAll
-                      treeData={processTreeData(malignantLesions)}
+                      className={styles.select_style}
+                      dropdownStyle={{ zIndex: 9999 }}
+                      options={malignantLesions}
+                      size="large"
                     />
                   </Form.Item>
-                  {currentData.eval === 2 ? (<>
-                    <label className={styles.label_item}> {/* Direct label styling */}
-                      <span style={{ color: "red" }}>*</span> Did the AURA Slider bar position affect your diagnostic decision? <br />
-                    </label>
-                    <Form.Item
-                      name="checkBenign "
-                      label=""
-                      rules={[
-                        { required: true, message: "This field is required" },
-                      ]}
-                      labelCol={{ span: 24 }}
-                      wrapperCol={{ span: 24 }}
-                      className={styles.form_item}
-                    >
-
-                      <Radio.Group style={{ marginTop: "10px" }}>
-                        <Radio value="yes" style={{ fontSize: "16px" }}>Yes</Radio>
-                        <Radio value="no" style={{ fontSize: "16px" }}>No</Radio>
-                      </Radio.Group>
-                    </Form.Item>
-                    <label className={styles.label_item}> {/* Direct label styling */}
-                      <span style={{ color: "red" }}>*</span> Did the AURA slider bar position affect the confidence level of your decision? <br />
-                    </label>
-                    <Form.Item
-                      name="confidenceBenignCheck"
-                      label=""
-                      rules={[
-                        { required: true, message: "This field is required" },
-                      ]}
-                      labelCol={{ span: 24 }}
-                      wrapperCol={{ span: 24 }}
-                      className={styles.form_item}
-                    >
-
-                      <Radio.Group style={{ marginTop: "10px" }}>
-                        <Radio value="MoreConfident" style={{ fontSize: "16px" }}>More confident</Radio>
-                        <Radio value="LessConfident" style={{ fontSize: "16px" }}>Less confident</Radio>
-                        <Radio value="NoEffect" style={{ fontSize: "16px" }}>No effect</Radio>
-                      </Radio.Group>
-                    </Form.Item></>) : null}
+                  {currentData.eval === 2 ? (
+                    <>
+                      <label className={styles.label_item}>
+                        {" "}
+                        {/* Direct label styling */}
+                        <span style={{ color: "red" }}>*</span> Did the AURA
+                        Slider bar position affect your diagnostic decision?{" "}
+                        <br />
+                      </label>
+                      <Form.Item
+                        name="affectDiagnostic"
+                        label=""
+                        rules={[
+                          { required: true, message: "This field is required" },
+                        ]}
+                        labelCol={{ span: 24 }}
+                        wrapperCol={{ span: 24 }}
+                        className={styles.form_item}
+                      >
+                        <Radio.Group style={{ marginTop: "10px" }}>
+                          <Radio value="yes" style={{ fontSize: "16px" }}>
+                            Yes
+                          </Radio>
+                          <Radio value="no" style={{ fontSize: "16px" }}>
+                            No
+                          </Radio>
+                        </Radio.Group>
+                      </Form.Item>
+                      <label className={styles.label_item}>
+                        {" "}
+                        {/* Direct label styling */}
+                        <span style={{ color: "red" }}>*</span> Did the AURA
+                        slider bar position affect the confidence level of your
+                        decision? <br />
+                      </label>
+                      <Form.Item
+                        name="affectConfidenceLevel"
+                        label=""
+                        rules={[
+                          { required: true, message: "This field is required" },
+                        ]}
+                        labelCol={{ span: 24 }}
+                        wrapperCol={{ span: 24 }}
+                        className={styles.form_item}
+                      >
+                        <Radio.Group style={{ marginTop: "10px" }}>
+                          <Radio
+                            value="More confident"
+                            style={{ fontSize: "16px" }}
+                          >
+                            More confident
+                          </Radio>
+                          <Radio
+                            value="Less confident"
+                            style={{ fontSize: "16px" }}
+                          >
+                            Less confident
+                          </Radio>
+                          <Radio value="No effect" style={{ fontSize: "16px" }}>
+                            No effect
+                          </Radio>
+                        </Radio.Group>
+                      </Form.Item>
+                    </>
+                  ) : null}
                 </>
               ) : null
             }
           </Form.Item>
-          <Button htmlType="submit" className={styles.btn} loading={isLoading} disabled={isLoading}>
+          <Button
+            htmlType="submit"
+            className={styles.btn}
+            loading={isLoading}
+            disabled={isLoading}
+          >
             NEXT
           </Button>
         </Form>
@@ -579,11 +672,18 @@ export default function EvaluationForm() {
           shape="square"
         />
         <FloatButton
-          description={<Statistic.Countdown value={deadline} format="mm:ss" valueStyle={{ fontSize: "14px", fontWeight: "600", color: "red" }} />}
+          description={
+            <Statistic.Countdown
+              value={deadline}
+              format="mm:ss"
+              valueStyle={{ fontSize: "14px", fontWeight: "600", color: "red" }}
+            />
+          }
           style={{ insetInlineEnd: 70, height: 50, width: 50 }}
           shape="square"
         />
       </div>
+      {isLoading && <LoadingPage />}
     </div>
   );
 }
