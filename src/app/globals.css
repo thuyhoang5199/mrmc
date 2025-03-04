@@ -71,6 +71,6 @@ a {
   background-color: #067db2 !important;
 }
 
-:where(.css-dev-only-do-not-override-1v613y0).ant-float-btn-group-square-shadow .ant-float-btn-square .ant-float-btn-body {
-width: 40px !important;
+.ant-float-btn-group-square-shadow .ant-float-btn-square .ant-float-btn-body {
+  width: 40px !important;
 }
