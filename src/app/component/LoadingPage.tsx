@@ -6,7 +6,6 @@ const LoadingPage = () => {
   return (
     <div className="loading-page">
       <Spin
-        tip="Loading..."
         indicator={<LoadingOutlined style={{ fontSize: 40 }} />}
         fullscreen={false}
       />

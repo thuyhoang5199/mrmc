@@ -22,6 +22,8 @@ import { Image } from "antd";
 import { FileTextOutlined, LogoutOutlined } from "@ant-design/icons";
 import { useRouter } from "next/navigation";
 import LoadingPage from "../component/LoadingPage";
+import { axiosInstance } from "../axios-instance";
+import { logout } from "../functions/logout";
 
 const marksBenign: SliderSingleProps["marks"] = {
   1: {
@@ -130,7 +132,6 @@ export default function EvaluationForm() {
 
   const [messageApi, contextHolder] = message.useMessage();
   const [api, contextHolderNotificationSave] = notification.useNotification();
-  const [notificationClient] = notification.useNotification();
 
   const [deadline, setDeadline] = useState(Date.now());
   const [isLogoutOpen, setIsLogoutOpen] = useState(false);
@@ -178,21 +179,18 @@ export default function EvaluationForm() {
 
   useEffect(() => {
     setIsLoading(true);
-    fetch("/api/question")
-      .then(async (res: Response) => {
-        const data = await res.json();
-        if (data?.successAll) {
+    axiosInstance(router).get("/api/question")
+      .then(async (res) => {
+        if (res.data.successAll) {
           router.replace("/result");
         } else {
-          setQuestionInfo(data);
+          setQuestionInfo(res.data);
         }
       })
       .catch(async (e) => {
-        const data = await e.json();
-
         api.error({
           message: "Get Data Error",
-          description: data.message,
+          description: e.message,
         });
       })
       .finally(() => {
@@ -224,29 +222,18 @@ export default function EvaluationForm() {
 
   const onFinish = (values: unknown) => {
     setIsLoading(true);
-    fetch("/api/question", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(values),
-    })
-      .then(async (res: Response) => {
-        const data = await res.json();
-        if (data?.successAll) {
+    axiosInstance(router).post('/api/question', values)
+      .then((res) => {
+        if (res.data?.successAll) {
           router.replace("/result");
-          setCurrentData({
-            eval: 1,
-            eval1: null, // Default object for eval1
-            eval2: null, // Default object for eval2
-          });
         }
-        setQuestionInfo(data);
+        setQuestionInfo(res.data);
         form.resetFields();
       })
       .catch(async (e) => {
-        const data = await e.json();
         api.success({
           message: "Save error",
-          description: data.message,
+          description: e.message,
         });
       })
       .finally(() => {
@@ -272,19 +259,8 @@ export default function EvaluationForm() {
     });
   };
 
-  const logout = () => {
-    fetch("/api/auth/logout", { method: "POST", body: "{}" })
-      .then(async () => {
-        router.replace("/");
-      })
-      .catch(async (e) => {
-        const data = await e.json();
-
-        notificationClient.error({
-          message: "Get Data Error",
-          description: data.message,
-        });
-      });
+  const submitLogout = () => {
+    logout(router)
   };
 
   return (
@@ -368,7 +344,7 @@ export default function EvaluationForm() {
             ) : currentData.eval === 2 ? (
               <Image
                 alt=""
-                src={`${questionInfo.lesionAuraResultScreen}.jpg`}
+                src={questionInfo.lesionAuraResultScreen ? `${questionInfo.lesionAuraResultScreen}.jpg` : undefined}
                 className={styles.img}
               />
             ) : (
@@ -386,7 +362,7 @@ export default function EvaluationForm() {
             ) : (
               <Image
                 alt=""
-                src={`${questionInfo.lesionPicture}.jpg`}
+                src={questionInfo.lesionPicture ? `${questionInfo.lesionPicture}.jpg` : undefined}
                 className={styles.img}
               />
             )}
@@ -681,9 +657,7 @@ export default function EvaluationForm() {
             NEXT
           </Button>
         </Form>
-        <FloatButton.Group open={true}
-          shape="square"
-          style={{ insetInlineEnd: 24 }}
+        <FloatButton.Group
         >
           <FloatButton
             description={
@@ -707,7 +681,7 @@ export default function EvaluationForm() {
           />
           <FloatButton icon={<LogoutOutlined />} shape="square" className={styles.btn_float} tooltip={<div>SIGN OUT</div>} onClick={() => { setIsLogoutOpen(true) }} />
         </FloatButton.Group>
-        <Modal title="SIGN OUT" open={isLogoutOpen} onOk={logout} onCancel={() => { setIsLogoutOpen(false) }} style={{ width: "100px" }}>
+        <Modal title="SIGN OUT" open={isLogoutOpen} onOk={submitLogout} onCancel={() => { setIsLogoutOpen(false) }} style={{ width: "100px" }}>
           <p>When you log out, the evaluation results will be saved.</p>
         </Modal>
 

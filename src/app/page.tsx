@@ -5,6 +5,7 @@ import styles from "./page.module.css";
 import type { FormProps } from "antd";
 import { Button, Form, Input, Typography } from "antd";
 import { useRouter } from "next/navigation";
+import { axiosInstance } from "./axios-instance";
 
 type FieldType = {
   username?: string;
@@ -18,26 +19,21 @@ export default function Home() {
 
   const onFinish: FormProps<FieldType>["onFinish"] = async (values) => {
     setIsLoading(true);
-    const response = await fetch("/api/auth/", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        username: values.username,
-        password: values.password,
-      }),
-    });
-    setIsLoading(false);
-    if (response.ok) {
+    await axiosInstance(router).post("/api/auth", {
+      username: values.username,
+      password: values.password,
+    }).then(() => {
       router.push("/evaluationForm");
-    } else {
-      const error = await response.json();
+    }).catch((error) => {
       form.setFields([
         {
           name: "password",
           errors: [error.message],
         },
       ]);
-    }
+    }).finally(() => {
+      setIsLoading(false);
+    });
   };
 
   const onFinishFailed: FormProps<FieldType>["onFinishFailed"] = (
