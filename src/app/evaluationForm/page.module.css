@@ -100,8 +100,8 @@
 }
 
 .btn_float {
-  width: 50px !important;
-  height: 50px !important;
+  width: 65px !important;
+  height: 65px !important;
 }
 
 @media (max-width: 1200px) {

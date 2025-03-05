@@ -688,13 +688,17 @@ export default function EvaluationForm() {
           <FloatButton
 
             description={
-              <span><FileTextOutlined style={{ color: "#075f85", fontSize: "16px" }} /><br /><span style={{ color: "#075f85", fontWeight: "600" }}>SAVE</span></span>
+              <span><FileTextOutlined style={{ color: "#075f85", fontSize: "18px" }} /><br /><span style={{ color: "#075f85", fontWeight: "600" }}>SAVE</span></span>
             }
             onClick={openNotificationWithIcon}
             shape="square"
             className={styles.btn_float}
           />
-          <FloatButton icon={<LogoutOutlined />} shape="square" className={styles.btn_float} tooltip={<div>SIGN OUT</div>} onClick={() => { setIsLogoutOpen(true) }} />
+          <FloatButton shape="square" className={styles.btn_float} onClick={() => { setIsLogoutOpen(true) }}
+            description={
+              <span><LogoutOutlined style={{ color: "#075f85", fontSize: "18px" }} /><br /><span style={{ color: "#075f85", fontWeight: "600" }}>LOGOUT</span></span>
+            }
+          />
         </FloatButton.Group>
         <Modal title="SIGN OUT" open={isLogoutOpen} onOk={submitLogout} onCancel={() => { setIsLogoutOpen(false) }} style={{ width: "100px" }}>
           <p>When you log out, the evaluation results will be saved.</p>
