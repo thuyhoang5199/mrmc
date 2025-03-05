@@ -276,16 +276,13 @@ export default function EvaluationForm() {
   };
 
   useEffect(() => {
-    // Hàm setInterval để đếm thời gian
     const interval = setInterval(() => {
       setSeconds(prevSeconds => prevSeconds + 1);
     }, 1000);
-
-    // Dọn dẹp khi component bị unmount
     return () => clearInterval(interval);
   }, []);
 
-  // Chuyển đổi số giây thành định dạng mm:ss
+
   const formatTime = (secs: number) => {
     const minutes = Math.floor(secs / 60);
     const remainingSeconds = secs % 60;
