@@ -696,7 +696,7 @@ export default function EvaluationForm() {
           />
           <FloatButton shape="square" className={styles.btn_float} onClick={() => { setIsLogoutOpen(true) }}
             description={
-              <span><LogoutOutlined style={{ color: "#075f85", fontSize: "18px" }} /><br /><span style={{ color: "#075f85", fontWeight: "600" }}>LOGOUT</span></span>
+              <span><LogoutOutlined style={{ fontSize: "18px" }} /><br /><span style={{ fontWeight: "600" }}>LOGOUT</span></span>
             }
           />
         </FloatButton.Group>
