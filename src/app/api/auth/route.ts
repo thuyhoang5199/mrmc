@@ -1,10 +1,6 @@
 import jwt from "jsonwebtoken";
 import { NextResponse } from "next/server";
-import {
-  EXPIRED_TIME,
-  GOOGLE_DATA_SPREAD_SHEET_ID,
-  JWT_SECRET_KEY,
-} from "../constants";
+import { EXPIRED_TIME } from "../constants";
 import { getDataInRange } from "../utils/google/common";
 import { get } from "lodash";
 import { serialize } from "cookie";
@@ -22,7 +18,7 @@ export async function POST(req: Request) {
 
   const accounts = await getDataInRange({
     range: "Login_Manage!B:E",
-    spreadsheetId: GOOGLE_DATA_SPREAD_SHEET_ID,
+    spreadsheetId: process.env.GOOGLE_DATA_SPREAD_SHEET_ID as string,
   });
 
   accounts.shift();
@@ -55,7 +51,7 @@ export async function POST(req: Request) {
       id: account.id,
       name: account.name,
     },
-    JWT_SECRET_KEY as string,
+    process.env.JWT_SECRET_KEY as string,
     { expiresIn: EXPIRED_TIME }
   );
 

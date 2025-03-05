@@ -1,19 +1,23 @@
 import { NextResponse } from "next/server";
 import jwt, { JwtPayload } from "jsonwebtoken";
-import { JWT_SECRET_KEY } from "../constants";
 
 export function validateAuthenticated({ token }: { token: string | null }) {
   try {
     if (!token) {
-      return NextResponse.json(
+      const response = NextResponse.json(
         {
-          message: "token is required",
+          message: "unauthenticated",
         },
         { status: 401 }
       );
+      response.cookies.delete("session");
+      return response;
     }
 
-    const decode = jwt.verify(token, JWT_SECRET_KEY) as JwtPayload;
+    const decode = jwt.verify(
+      token,
+      process.env.JWT_SECRET_KEY as string
+    ) as JwtPayload;
     return {
       username: decode.username,
       id: decode.id,
@@ -21,11 +25,13 @@ export function validateAuthenticated({ token }: { token: string | null }) {
     };
   } catch (e) {
     console.log("validate token error: ", e);
-    return NextResponse.json(
+    const response = NextResponse.json(
       {
         message: "unauthenticated",
       },
       { status: 401 }
     );
+    response.cookies.delete("session");
+    return response;
   }
 }

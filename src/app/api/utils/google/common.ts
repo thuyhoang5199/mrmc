@@ -1,11 +1,10 @@
 import { google } from "googleapis";
 import { get } from "lodash";
-import { GOOGLE_PROFILES } from "../../constants";
 
 export async function getDataInRange({
   range,
   spreadsheetId,
-  profileIndex = 0,
+  profileIndex = 1, //start with 1
 }: {
   range: string;
   spreadsheetId: string;
@@ -36,7 +35,7 @@ export async function getDataInRange({
 
 export async function writeDataInRange({
   spreadsheetId,
-  profileIndex = 0,
+  profileIndex = 1,
   data,
 }: {
   spreadsheetId: string;
@@ -74,13 +73,25 @@ export async function writeDataInRange({
 }
 
 function getSheet({ profileIndex }: { profileIndex: number }) {
-  if (profileIndex > GOOGLE_PROFILES.length - 1) {
+  if (profileIndex > Number(process.env.GOOGLE_PROFILE_LENGTH)) {
     throw new Error(
       "Could not connect to server, please try again in a few minutes"
     );
   }
+  const credentials = {
+    type: "service_account",
+    project_id: process.env[`GOOGLE_PROFILE_PROJECT_ID_${profileIndex}`],
+    private_key_id:
+      process.env[`GOOGLE_PROFILE_PRIVATE_KEY_ID_${profileIndex}`],
+    private_key: process.env[
+      `GOOGLE_PROFILE_PRIVATE_KEY_${profileIndex}`
+    ]?.replace(/\\n/g, "\n"),
+    client_email: process.env[`GOOGLE_PROFILE_CLIENT_EMAIL_${profileIndex}`],
+    client_id: process.env[`GOOGLE_PROFILE_CLIENT_ID_${profileIndex}`],
+    universe_domain: "googleapis.com",
+  };
   const auth = new google.auth.GoogleAuth({
-    credentials: GOOGLE_PROFILES[profileIndex],
+    credentials: credentials,
     scopes: ["https://www.googleapis.com/auth/spreadsheets"],
   });
 

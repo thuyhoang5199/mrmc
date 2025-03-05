@@ -1,7 +1,6 @@
 import { get } from "lodash";
 import { NextRequest, NextResponse } from "next/server";
 import { validateAuthenticated } from "../auth/validate-authenticated";
-import { GOOGLE_DATA_SPREAD_SHEET_ID, LESION_LENGTH } from "../constants";
 import {
   getColumnNameByIndex,
   getDataInRange,
@@ -20,7 +19,7 @@ export async function GET() {
 
   const answers = await getDataInRange({
     range: "Answer!A:C",
-    spreadsheetId: GOOGLE_DATA_SPREAD_SHEET_ID,
+    spreadsheetId: process.env.GOOGLE_DATA_SPREAD_SHEET_ID as string,
   });
   answers.shift();
   answers.shift();
@@ -38,6 +37,8 @@ export async function GET() {
   let nextQuestionIndex: number;
   let nextQuestionIndexInListQuestion = 1;
 
+  const LESION_LENGTH = Number(process.env.LESION_LENGTH);
+
   if (!currentAnswer) {
     let index = 1;
     let listLesion: number[] = [];
@@ -50,7 +51,7 @@ export async function GET() {
     const nextIndexToWrite = answers.length + 3;
     nextQuestionIndex = listLesion[0];
     await writeDataInRange({
-      spreadsheetId: GOOGLE_DATA_SPREAD_SHEET_ID,
+      spreadsheetId: process.env.GOOGLE_DATA_SPREAD_SHEET_ID as string,
       data: [
         {
           range: `Answer!A${nextIndexToWrite}:C${nextIndexToWrite}`,
@@ -71,7 +72,7 @@ export async function GET() {
 
   const questions = await getDataInRange({
     range: `Lesion_Info!A${nextQuestionIndex + 1}:H${nextQuestionIndex + 1}`,
-    spreadsheetId: GOOGLE_DATA_SPREAD_SHEET_ID,
+    spreadsheetId: process.env.GOOGLE_DATA_SPREAD_SHEET_ID as string,
   });
 
   const question = questions.map((item) => {
@@ -106,9 +107,10 @@ export async function POST(req: NextRequest) {
     return account;
   }
 
+  const LESION_LENGTH = Number(process.env.LESION_LENGTH);
   const answers = await getDataInRange({
     range: "Answer!A:C",
-    spreadsheetId: GOOGLE_DATA_SPREAD_SHEET_ID,
+    spreadsheetId: process.env.GOOGLE_DATA_SPREAD_SHEET_ID as string,
   });
   answers.shift();
   answers.shift();
@@ -149,7 +151,7 @@ export async function POST(req: NextRequest) {
       currentAnswer.currentLesion * 2 + 2
     );
     await writeDataInRange({
-      spreadsheetId: GOOGLE_DATA_SPREAD_SHEET_ID,
+      spreadsheetId: process.env.GOOGLE_DATA_SPREAD_SHEET_ID as string,
       data: [
         {
           values: [[nextQuestionIndex || "-1"]],
@@ -196,7 +198,7 @@ export async function POST(req: NextRequest) {
       range: `Lesion_Info!A${Number(nextQuestionIndex) + 1}:H${
         Number(nextQuestionIndex) + 1
       }`,
-      spreadsheetId: GOOGLE_DATA_SPREAD_SHEET_ID,
+      spreadsheetId: process.env.GOOGLE_DATA_SPREAD_SHEET_ID as string,
     });
 
     const nextQuestionIndexInListQuestion =
