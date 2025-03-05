@@ -74,3 +74,19 @@ a {
 .ant-float-btn-group-square-shadow .ant-float-btn-square .ant-float-btn-body {
   width: 40px !important;
 }
+
+.ant-select-single.ant-select-lg .ant-select-selector {
+  font-size: 20px !important;
+}
+
+.ant-select-dropdown .ant-select-item {
+  font-size: 18px !important;
+}
+
+.ant-radio-wrapper {
+  margin-inline-end: 18px !important
+}
+
+.ant-radio-label {
+  font-size: 18px !important;
+}
