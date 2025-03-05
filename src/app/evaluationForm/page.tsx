@@ -358,6 +358,7 @@ export default function EvaluationForm() {
                 alt=""
                 src={questionInfo.lesionAuraResultScreen ? `${questionInfo.lesionAuraResultScreen}.jpg` : undefined}
                 className={styles.img}
+                preview={false}
               />
             ) : (
               <div className={styles.note_not_img}>
@@ -376,6 +377,7 @@ export default function EvaluationForm() {
                 alt=""
                 src={questionInfo.lesionPicture ? `${questionInfo.lesionPicture}.jpg` : undefined}
                 className={styles.img}
+                preview={false}
               />
             )}
           </Typography>
