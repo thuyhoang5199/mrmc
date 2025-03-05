@@ -36,6 +36,10 @@ const marksBenign: SliderSingleProps["marks"] = {
     },
     label: <strong>High confidence Benign</strong>,
   },
+  10: "10",
+  20: "20",
+  30: "30",
+  40: "40",
   50: {
     style: {
       color: "#9c9006",
@@ -60,6 +64,10 @@ const marksMalignant: SliderSingleProps["marks"] = {
       <strong className={styles.note_slide}>Low confidence Malignant </strong>
     ),
   },
+  60: "60",
+  70: "70",
+  80: "80",
+  90: "90",
   100: {
     style: {
       color: "red",
