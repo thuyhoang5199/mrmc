@@ -145,7 +145,7 @@ export default function EvaluationForm() {
   const [messageApi, contextHolder] = message.useMessage();
   const [api, contextHolderNotificationSave] = notification.useNotification();
 
-  const [deadline, setDeadline] = useState(Date.now());
+  const [seconds, setSeconds] = useState(0);
   const [isLogoutOpen, setIsLogoutOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [questionInfo, setQuestionInfo] = useState({
@@ -207,7 +207,7 @@ export default function EvaluationForm() {
       })
       .finally(() => {
         setIsLoading(false);
-        setDeadline(Date.now() + 1000 * 60);
+        setSeconds(0);
       });
   }, []);
 
@@ -250,7 +250,7 @@ export default function EvaluationForm() {
       })
       .finally(() => {
         setIsLoading(false);
-        setDeadline(Date.now() + 1000 * 60);
+        setSeconds(0);
       });
   };
 
@@ -273,6 +273,23 @@ export default function EvaluationForm() {
 
   const submitLogout = () => {
     logout(router)
+  };
+
+  useEffect(() => {
+    // Hàm setInterval để đếm thời gian
+    const interval = setInterval(() => {
+      setSeconds(prevSeconds => prevSeconds + 1);
+    }, 1000);
+
+    // Dọn dẹp khi component bị unmount
+    return () => clearInterval(interval);
+  }, []);
+
+  // Chuyển đổi số giây thành định dạng mm:ss
+  const formatTime = (secs: number) => {
+    const minutes = Math.floor(secs / 60);
+    const remainingSeconds = secs % 60;
+    return `${String(minutes).padStart(2, '0')}:${String(remainingSeconds).padStart(2, '0')}`;
   };
 
   return (
@@ -676,11 +693,7 @@ export default function EvaluationForm() {
         >
           <FloatButton
             description={
-              <Statistic.Countdown
-                value={deadline}
-                format="mm:ss"
-                valueStyle={{ fontSize: "14px", fontWeight: "600", color: "red" }}
-              />
+              <Statistic value={formatTime(seconds)} />
             }
             shape="square"
             className={styles.btn_float}
