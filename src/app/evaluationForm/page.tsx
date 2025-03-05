@@ -30,9 +30,9 @@ const marksBenign: SliderSingleProps["marks"] = {
     style: {
       color: "#086f0f",
       width: "100px",
-      left: "-55px",
-      top: "-45px",
-      fontSize: "16px"
+      left: "-60px",
+      top: "-50px",
+      fontSize: "18px"
     },
     label: <strong>High confidence Benign</strong>,
   },
@@ -44,9 +44,9 @@ const marksBenign: SliderSingleProps["marks"] = {
     style: {
       color: "#9c9006",
       width: "100px",
-      top: "-45px",
+      top: "-50px",
       transform: "translateX(4%)",
-      fontSize: "16px"
+      fontSize: "18px"
     },
     label: <strong>Low confidence Benign</strong>,
   },
@@ -56,9 +56,9 @@ const marksMalignant: SliderSingleProps["marks"] = {
     style: {
       color: "#9c9006",
       width: "100px",
-      left: "-55px",
-      top: "-45px",
-      fontSize: "16px"
+      left: "-60px",
+      top: "-50px",
+      fontSize: "18px"
     },
     label: (
       <strong className={styles.note_slide}>Low confidence Malignant </strong>
@@ -72,9 +72,9 @@ const marksMalignant: SliderSingleProps["marks"] = {
     style: {
       color: "red",
       width: "100px",
-      top: "-45px",
+      top: "-50px",
       transform: "translateX(4%)",
-      fontSize: "16px"
+      fontSize: "18px"
     },
     label: (
       <strong className={styles.note_slide}>High confidence Malignant </strong>
@@ -291,7 +291,7 @@ export default function EvaluationForm() {
             {questionInfo.lesionLength}
           </Typography.Title>
           <Typography.Title level={3}>
-            Doctor Id: {questionInfo.account.id}
+            Doctor ID: {questionInfo.account.id}
           </Typography.Title>
           <Typography.Title level={3}>
             Doctor Name: {questionInfo.account.name}
