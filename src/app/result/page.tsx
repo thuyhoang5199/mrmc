@@ -21,10 +21,10 @@ export default function ResultPage() {
       />
       <Result
         status="success"
-        title="Congratulations!  You have completed the MRMC Study successfully. Thank you for your support."
+        title={<span className={styles.title}>Congratulations! <br />You have completed the MRMC Study successfully. <br />Thank you for your support.</span>}
         className={styles.text_result}
       />
-      <Button className={styles.btn} onClick={submitLogout}>
+      <Button className={styles.btn} onClick={submitLogout} size="large">
         SIGN OUT
       </Button>
     </div>
