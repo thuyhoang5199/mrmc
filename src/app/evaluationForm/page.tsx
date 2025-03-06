@@ -406,7 +406,10 @@ export default function EvaluationForm() {
               />
             )}
           </Typography>
-
+          <label className={styles.label_item}>
+            {/* Direct label styling */}
+            <span style={{ color: "red" }}>**Note: Actinic Keratosis is classified as malignant.</span>
+          </label>
           <Form.Item
             name="type"
             label=""
