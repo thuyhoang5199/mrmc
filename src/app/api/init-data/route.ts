@@ -29,7 +29,7 @@ export async function POST(req: NextRequest) {
       (i) => i.properties?.title == "Answer_Lesion_1"
     );
 
-    const requests: Array<any> = [];
+    const requests = [];
     for (let i = 2; i <= Number(process.env.LESION_LENGTH); i++) {
       requests.push({
         duplicateSheet: {
