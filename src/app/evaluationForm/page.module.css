@@ -28,6 +28,7 @@
 }
 .property_value {
   font-size: 24px !important;
+  font-weight: 600;
 }
 
 .input_property {
@@ -75,7 +76,7 @@
 }
 
 .img{
-  height: 320px!important ;
+  height: 320px !important ;
   /* width: 495px !important; */
 }
 
@@ -105,11 +106,14 @@
 
 @media (max-width: 1200px) {
   .img{
-    height: 250px!important ;
+    height: 25dvw !important ;
     width: auto !important;
   }
-
+  .note_not_img {
+    height: 25dvw !important ;
+  }
 }
+
 @media (max-width: 768px) {
   .container {
     width: 90%;
@@ -119,8 +123,8 @@
     flex-direction: column;
   }
   .img{
-    height: auto ;
-    width: 100%;
+    height: auto !important;
+    width: 100% !important;
   }
   .note_not_img {
     height: 200px;

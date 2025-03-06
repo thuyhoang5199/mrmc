@@ -21,7 +21,7 @@ export default function ResultPage() {
       />
       <Result
         status="success"
-        title="Successfully MRMC Evaluation"
+        title="Congratulations!  You have completed the MRMC Study successfully. Thank you for your support."
         className={styles.text_result}
       />
       <Button className={styles.btn} onClick={submitLogout}>

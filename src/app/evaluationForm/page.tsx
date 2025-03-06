@@ -218,6 +218,7 @@ export default function EvaluationForm() {
         eval: 2,
         eval1: values,
       });
+      success()
       form.resetFields();
     } else {
       onFinish({
@@ -251,6 +252,7 @@ export default function EvaluationForm() {
       .finally(() => {
         setIsLoading(false);
         setSeconds(0);
+        success()
       });
   };
 
@@ -262,6 +264,15 @@ export default function EvaluationForm() {
           "IMPORTANT NOTE:  For the MRM Study, Actinic Keratosis (AK) is classified as a “malignant” diagnosis",
       });
     }
+  };
+
+  const success = () => {
+    messageApi.open({
+      type: "success",
+      content:
+        "Data is automatically saved",
+    });
+
   };
 
   const openNotificationWithIcon = () => {
@@ -686,21 +697,27 @@ export default function EvaluationForm() {
             NEXT
           </Button>
         </Form>
+        <FloatButton
+          style={{
+            position: 'fixed',
+            top: '50%',
+            right: 26,
+            transform: 'translateY(-50%)', // Để căn giữa chính xác theo chiều dọc
+          }}
+          description={
+            <div><FileTextOutlined style={{ color: "#075f85", fontSize: "22px", paddingBottom: "8px" }} /><br /><span style={{ color: "#075f85", fontWeight: "600", fontSize: "18px" }}>SAVE</span></div>
+          }
+          onClick={openNotificationWithIcon}
+          shape="square"
+          className={styles.btn_float}
+        />
         <FloatButton.Group
+
         >
           <FloatButton
             description={
               <Statistic value={formatTime(seconds)} />
             }
-            shape="square"
-            className={styles.btn_float}
-          />
-          <FloatButton
-
-            description={
-              <span><FileTextOutlined style={{ color: "#075f85", fontSize: "18px" }} /><br /><span style={{ color: "#075f85", fontWeight: "600" }}>SAVE</span></span>
-            }
-            onClick={openNotificationWithIcon}
             shape="square"
             className={styles.btn_float}
           />
