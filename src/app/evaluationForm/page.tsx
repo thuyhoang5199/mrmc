@@ -241,7 +241,7 @@ export default function EvaluationForm() {
       .post("/api/question", values)
       .then((res) => {
         if (res.data?.successAll) {
-          router.replace("/result");
+          router.replace("/signaturePage");
         } else {
           setQuestionInfo(res.data);
         }

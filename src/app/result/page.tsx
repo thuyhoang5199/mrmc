@@ -1,16 +1,10 @@
 "use client"; // Explicitly mark this file as a Client Component
 
 import React from "react";
-import { Result, Image, Button } from "antd";
+import { Result, Image } from "antd";
 import styles from "./page.module.css";
-import { useRouter } from "next/navigation";
-import { logout } from "../functions/logout";
 
 export default function ResultPage() {
-  const router = useRouter();
-  const submitLogout = () => {
-    logout(router)
-  };
   return (
     <div className={styles.page}>
       <Image
@@ -21,12 +15,15 @@ export default function ResultPage() {
       />
       <Result
         status="success"
-        title={<span className={styles.title}>Congratulations! <br />You have completed the MRMC Study successfully. <br />Thank you for your support.</span>}
+        title={
+          <span className={styles.title}>
+            Congratulations! <br />
+            You have completed the MRMC Study successfully. <br />
+            Thank you for your support.
+          </span>
+        }
         className={styles.text_result}
       />
-      <Button className={styles.btn} onClick={submitLogout} size="large">
-        SIGN OUT
-      </Button>
     </div>
   );
 }

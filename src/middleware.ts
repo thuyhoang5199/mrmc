@@ -3,7 +3,7 @@ import { cookies } from "next/headers";
 import jwt, { JwtPayload } from "jsonwebtoken";
 
 // 1. Specify protected and public routes
-const protectedRoutes = ["/evaluationForm", "/result"];
+const protectedRoutes = ["/evaluationForm", "/signaturePage", "/result"];
 const publicRoutes = ["/"];
 
 export default async function middleware(req: NextRequest) {
@@ -13,14 +13,15 @@ export default async function middleware(req: NextRequest) {
   const isPublicRoute = publicRoutes.includes(path);
 
   // 3. Decrypt the session from the cookie
-  const cookie = (await cookies()).get("session")?.value;
-  if (!cookie) {
+  const cookie = await cookies();
+  const token = cookie.get("session")?.value;
+  if (!token) {
     if (isProtectedRoute)
       return NextResponse.redirect(new URL("/", req.nextUrl));
     else return NextResponse.next();
   }
   try {
-    const session = jwt.decode(cookie as string) as JwtPayload;
+    const session = jwt.decode(token as string) as JwtPayload;
 
     // 4. Redirect to /login if the user is not authenticated
     if (isProtectedRoute && !session?.id) {
@@ -39,7 +40,9 @@ export default async function middleware(req: NextRequest) {
     console.log("unauthenticated", e);
     return NextResponse.redirect(new URL("/", req.nextUrl));
   }
-
+  if (path == "/result") {
+    cookie.delete("session");
+  }
   return NextResponse.next();
 }
 

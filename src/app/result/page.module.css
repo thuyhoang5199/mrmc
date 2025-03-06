@@ -13,20 +13,9 @@
 }
 
 .text_result {
-  padding: 20px !important
+  padding: 20px !important;
 }
 
-.btn {
-  background-color: #13BED8 !important;
-  border-radius: 100px !important;
-  color: #fff !important;
-  font-size: 22px !important;
-}
-
-.btn:hover {
-  background-color: #067DB2 !important;
-  color: #fff !important;
-}
 .title {
   font-size: 30px;
   line-height: 50px;
