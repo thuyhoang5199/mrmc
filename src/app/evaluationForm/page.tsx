@@ -17,9 +17,10 @@ import {
   Skeleton,
   Statistic,
   Modal,
+  Space,
 } from "antd";
 import { Image } from "antd";
-import { FileTextOutlined, LogoutOutlined } from "@ant-design/icons";
+import { LogoutOutlined } from "@ant-design/icons";
 import { useRouter } from "next/navigation";
 import LoadingPage from "../component/LoadingPage";
 import { axiosInstance } from "../axios-instance";
@@ -32,7 +33,7 @@ const marksBenign: SliderSingleProps["marks"] = {
       width: "100px",
       left: "-60px",
       top: "-50px",
-      fontSize: "18px"
+      fontSize: "18px",
     },
     label: <strong>High confidence Benign</strong>,
   },
@@ -46,7 +47,7 @@ const marksBenign: SliderSingleProps["marks"] = {
       width: "100px",
       top: "-50px",
       transform: "translateX(4%)",
-      fontSize: "18px"
+      fontSize: "18px",
     },
     label: <strong>Low confidence Benign</strong>,
   },
@@ -58,7 +59,7 @@ const marksMalignant: SliderSingleProps["marks"] = {
       width: "100px",
       left: "-60px",
       top: "-50px",
-      fontSize: "18px"
+      fontSize: "18px",
     },
     label: (
       <strong className={styles.note_slide}>Low confidence Malignant </strong>
@@ -74,7 +75,7 @@ const marksMalignant: SliderSingleProps["marks"] = {
       width: "100px",
       top: "-50px",
       transform: "translateX(4%)",
-      fontSize: "18px"
+      fontSize: "18px",
     },
     label: (
       <strong className={styles.note_slide}>High confidence Malignant </strong>
@@ -191,7 +192,8 @@ export default function EvaluationForm() {
 
   useEffect(() => {
     setIsLoading(true);
-    axiosInstance(router).get("/api/question")
+    axiosInstance(router)
+      .get("/api/question")
       .then(async (res) => {
         if (res.data.successAll) {
           router.replace("/result");
@@ -218,7 +220,7 @@ export default function EvaluationForm() {
         eval: 2,
         eval1: values,
       });
-      success()
+      success();
       form.resetFields();
     } else {
       onFinish({
@@ -235,12 +237,14 @@ export default function EvaluationForm() {
 
   const onFinish = (values: unknown) => {
     setIsLoading(true);
-    axiosInstance(router).post('/api/question', values)
+    axiosInstance(router)
+      .post("/api/question", values)
       .then((res) => {
         if (res.data?.successAll) {
           router.replace("/result");
+        } else {
+          setQuestionInfo(res.data);
         }
-        setQuestionInfo(res.data);
         form.resetFields();
       })
       .catch(async (e) => {
@@ -252,7 +256,7 @@ export default function EvaluationForm() {
       .finally(() => {
         setIsLoading(false);
         setSeconds(0);
-        success()
+        success();
       });
   };
 
@@ -269,10 +273,8 @@ export default function EvaluationForm() {
   const success = () => {
     messageApi.open({
       type: "success",
-      content:
-        "Data is automatically saved",
+      content: "Data is automatically saved",
     });
-
   };
 
   const openNotificationWithIcon = () => {
@@ -283,21 +285,22 @@ export default function EvaluationForm() {
   };
 
   const submitLogout = () => {
-    logout(router)
+    logout(router);
   };
 
   useEffect(() => {
     const interval = setInterval(() => {
-      setSeconds(prevSeconds => prevSeconds + 1);
+      setSeconds((prevSeconds) => prevSeconds + 1);
     }, 1000);
     return () => clearInterval(interval);
   }, []);
 
-
   const formatTime = (secs: number) => {
     const minutes = Math.floor(secs / 60);
     const remainingSeconds = secs % 60;
-    return `${String(minutes).padStart(2, '0')}:${String(remainingSeconds).padStart(2, '0')}`;
+    return `${String(minutes).padStart(2, "0")}:${String(
+      remainingSeconds
+    ).padStart(2, "0")}`;
   };
 
   return (
@@ -381,7 +384,11 @@ export default function EvaluationForm() {
             ) : currentData.eval === 2 ? (
               <Image
                 alt=""
-                src={questionInfo.lesionAuraResultScreen ? `${questionInfo.lesionAuraResultScreen}.jpg` : undefined}
+                src={
+                  questionInfo.lesionAuraResultScreen
+                    ? `${questionInfo.lesionAuraResultScreen}.jpg`
+                    : undefined
+                }
                 className={styles.img}
                 preview={false}
               />
@@ -400,7 +407,11 @@ export default function EvaluationForm() {
             ) : (
               <Image
                 alt=""
-                src={questionInfo.lesionPicture ? `${questionInfo.lesionPicture}.jpg` : undefined}
+                src={
+                  questionInfo.lesionPicture
+                    ? `${questionInfo.lesionPicture}.jpg`
+                    : undefined
+                }
                 className={styles.img}
                 preview={false}
               />
@@ -408,7 +419,9 @@ export default function EvaluationForm() {
           </Typography>
           <label className={styles.label_item}>
             {/* Direct label styling */}
-            <span style={{ color: "red" }}>**Note: Actinic Keratosis is classified as malignant.</span>
+            <span style={{ color: "red" }}>
+              **Note: Actinic Keratosis is classified as malignant.
+            </span>
           </label>
           <Form.Item
             name="type"
@@ -690,50 +703,59 @@ export default function EvaluationForm() {
               ) : null
             }
           </Form.Item>
-          <Button
-            htmlType="submit"
-            className={styles.btn}
-            loading={isLoading}
-            disabled={isLoading}
-            size="large"
-          >
-            NEXT
-          </Button>
+          <Space>
+            <Button
+              className={styles.btn}
+              loading={isLoading}
+              disabled={isLoading}
+              onClick={openNotificationWithIcon}
+              size="large"
+            >
+              SAVE
+            </Button>
+            <Button
+              htmlType="submit"
+              className={styles.btn}
+              loading={isLoading}
+              disabled={isLoading}
+              size="large"
+            >
+              NEXT
+            </Button>
+          </Space>
         </Form>
-        <FloatButton
-          style={{
-            position: 'fixed',
-            top: '50%',
-            right: 26,
-            transform: 'translateY(-50%)', // Để căn giữa chính xác theo chiều dọc
-          }}
-          description={
-            <div><FileTextOutlined style={{ color: "#075f85", fontSize: "22px", paddingBottom: "8px" }} /><br /><span style={{ color: "#075f85", fontWeight: "600", fontSize: "18px" }}>SAVE</span></div>
-          }
-          onClick={openNotificationWithIcon}
-          shape="square"
-          className={styles.btn_float}
-        />
-        <FloatButton.Group
-
-        >
+        <FloatButton.Group>
           <FloatButton
-            description={
-              <Statistic value={formatTime(seconds)} />
-            }
+            description={<Statistic value={formatTime(seconds)} />}
             shape="square"
             className={styles.btn_float}
           />
-          <FloatButton shape="square" className={styles.btn_float} onClick={() => { setIsLogoutOpen(true) }}
+          <FloatButton
+            shape="square"
+            className={styles.btn_float}
+            onClick={() => {
+              setIsLogoutOpen(true);
+            }}
             description={
-              <span><LogoutOutlined style={{ fontSize: "18px" }} /><br /><span style={{ fontWeight: "600" }}>LOGOUT</span></span>
+              <span>
+                <LogoutOutlined style={{ fontSize: "18px" }} />
+                <br />
+                <span style={{ fontWeight: "600" }}>LOGOUT</span>
+              </span>
             }
           />
         </FloatButton.Group>
-        <Modal title="SIGN OUT" open={isLogoutOpen} onOk={submitLogout} onCancel={() => { setIsLogoutOpen(false) }} style={{ width: "100px" }}>
+        <Modal
+          title="SIGN OUT"
+          open={isLogoutOpen}
+          onOk={submitLogout}
+          onCancel={() => {
+            setIsLogoutOpen(false);
+          }}
+          style={{ width: "100px" }}
+        >
           <p>When you log out, the evaluation results will be saved.</p>
         </Modal>
-
       </div>
       {isLoading && <LoadingPage />}
     </div>

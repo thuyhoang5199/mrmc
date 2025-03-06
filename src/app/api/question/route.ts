@@ -1,12 +1,7 @@
 import { get } from "lodash";
 import { NextRequest, NextResponse } from "next/server";
 import { validateAuthenticated } from "../auth/validate-authenticated";
-import { GOOGLE_DATA_SPREAD_SHEET_ID, LESION_LENGTH } from "../constants";
-import {
-  getColumnNameByIndex,
-  getDataInRange,
-  writeDataInRange,
-} from "../utils/google/common";
+import { getDataInRange, writeDataInRange } from "../utils/google/common";
 import { cookies } from "next/headers";
 
 export async function GET() {
@@ -18,25 +13,26 @@ export async function GET() {
     return account;
   }
 
-  const answers = await getDataInRange({
-    range: "Answer!A:C",
-    spreadsheetId: GOOGLE_DATA_SPREAD_SHEET_ID,
+  const answersOverview = await getDataInRange({
+    range: "Answer_Overview!A:C",
+    spreadsheetId: process.env.GOOGLE_DATA_SPREAD_SHEET_ID as string,
   });
-  answers.shift();
-  answers.shift();
+  answersOverview.shift();
 
-  const answersFormatted = answers.map((item) => {
+  const answersOverviewFormatted = answersOverview.map((item) => {
     return {
       accountId: get(item, "0", ""),
       listLesion: get(item, "1", ""),
       currentLesion: get(item, "2", 0),
     };
   });
-  const currentAnswer = answersFormatted.find(
+  const currentAnswer = answersOverviewFormatted.find(
     (item) => item.accountId == account.id
   );
   let nextQuestionIndex: number;
   let nextQuestionIndexInListQuestion = 1;
+
+  const LESION_LENGTH = Number(process.env.LESION_LENGTH);
 
   if (!currentAnswer) {
     let index = 1;
@@ -47,14 +43,14 @@ export async function GET() {
     }
     listLesion = listLesion.sort(() => Math.random() - 0.5);
 
-    const nextIndexToWrite = answers.length + 3;
+    const nextIndexToWrite = answersOverview.length + 2;
     nextQuestionIndex = listLesion[0];
     await writeDataInRange({
-      spreadsheetId: GOOGLE_DATA_SPREAD_SHEET_ID,
+      spreadsheetId: process.env.GOOGLE_DATA_SPREAD_SHEET_ID as string,
       data: [
         {
-          range: `Answer!A${nextIndexToWrite}:C${nextIndexToWrite}`,
-          values: [[account.id, listLesion.join("|"), nextQuestionIndex]],
+          range: `Answer_Overview!A${nextIndexToWrite}:D${nextIndexToWrite}`,
+          values: [[account.id, listLesion.join("|"), nextQuestionIndex, "0"]],
         },
       ],
     });
@@ -71,7 +67,7 @@ export async function GET() {
 
   const questions = await getDataInRange({
     range: `Lesion_Info!A${nextQuestionIndex + 1}:H${nextQuestionIndex + 1}`,
-    spreadsheetId: GOOGLE_DATA_SPREAD_SHEET_ID,
+    spreadsheetId: process.env.GOOGLE_DATA_SPREAD_SHEET_ID as string,
   });
 
   const question = questions.map((item) => {
@@ -106,25 +102,25 @@ export async function POST(req: NextRequest) {
     return account;
   }
 
-  const answers = await getDataInRange({
-    range: "Answer!A:C",
-    spreadsheetId: GOOGLE_DATA_SPREAD_SHEET_ID,
+  const LESION_LENGTH = Number(process.env.LESION_LENGTH);
+  const answersOverview = await getDataInRange({
+    range: "Answer_Overview!A:C",
+    spreadsheetId: process.env.GOOGLE_DATA_SPREAD_SHEET_ID as string,
   });
-  answers.shift();
-  answers.shift();
+  answersOverview.shift();
 
-  const answersFormatted = answers.map((item) => {
+  const answersOverviewFormatted = answersOverview.map((item) => {
     return {
       accountId: get(item, "0", ""),
       listLesion: get(item, "1", ""),
       currentLesion: get(item, "2", 0),
     };
   });
-  const currentAnswer = answersFormatted.find(
+  const currentAnswerOverview = answersOverviewFormatted.find(
     (item) => item.accountId == account.id
   );
 
-  if (!currentAnswer) {
+  if (!currentAnswerOverview) {
     return NextResponse.json(
       {
         message:
@@ -133,54 +129,48 @@ export async function POST(req: NextRequest) {
       { status: 500 }
     );
   } else {
-    const listLesion = currentAnswer.listLesion.split("|");
+    const listLesion = currentAnswerOverview.listLesion.split("|");
     const nextQuestionIndex =
       listLesion[
         listLesion.findIndex(
-          (item) => item == currentAnswer.currentLesion.toString()
+          (item) => item == currentAnswerOverview.currentLesion.toString()
         ) + 1
       ];
+    const percent = (
+      ((listLesion.findIndex(
+        (item) => item == currentAnswerOverview.currentLesion.toString()
+      ) +
+        1) /
+        Number(process.env.LESION_LENGTH || "1")) *
+      100
+    ).toFixed(2);
 
-    const answerIndex = answersFormatted.indexOf(currentAnswer) + 3; // +1 to goto index in excel, +2 because 2 shift
-    const lesionAnswer1Column = getColumnNameByIndex(
-      currentAnswer.currentLesion * 2 + 1
-    );
-    const lesionAnswer2Column = getColumnNameByIndex(
-      currentAnswer.currentLesion * 2 + 2
-    );
+    const currentAnswerOverviewIndex =
+      answersOverviewFormatted.indexOf(currentAnswerOverview) + 2; // +1 to goto index in excel, +2 because 2 shift
+
     await writeDataInRange({
-      spreadsheetId: GOOGLE_DATA_SPREAD_SHEET_ID,
+      spreadsheetId: process.env.GOOGLE_DATA_SPREAD_SHEET_ID as string,
       data: [
         {
-          values: [[nextQuestionIndex || "-1"]],
-          range: `Answer!C${answerIndex}:C${answerIndex}`,
+          values: [[nextQuestionIndex || "-1", percent]],
+          range: `Answer_Overview!C${currentAnswerOverviewIndex}:D${currentAnswerOverviewIndex}`,
         },
         {
-          range: `Answer!${lesionAnswer1Column}${answerIndex}:${lesionAnswer2Column}${answerIndex}`,
+          range: `Answer_Lesion_${currentAnswerOverview.currentLesion}!A${
+            currentAnswerOverviewIndex + 1
+          }:J${currentAnswerOverviewIndex + 1}`,
           values: [
             [
-              `- Type: ${eval1.type}\n- Confidence Level: ${
-                eval1.type === "benign"
-                  ? eval1.benignConfidenceLevel
-                  : eval1.malignantConfidenceLevel
-              }\n- LesionType: ${
-                eval1.type === "benign"
-                  ? eval1.benignLesionType
-                  : eval1.malignantLesionType
-              }`,
-              `- Type: ${eval2.type}\n- Confidence Level: ${
-                eval2.type === "benign"
-                  ? eval2.benignConfidenceLevel
-                  : eval2.malignantConfidenceLevel
-              }\n- Lesion type: ${
-                eval2.type === "benign"
-                  ? eval2.benignLesionType
-                  : eval2.malignantLesionType
-              }\n- AURA Slider bar affect diagnostic: ${
-                eval2.affectDiagnostic
-              }\n- AURA Slider bar affect confidence level : ${
-                eval2.affectConfidenceLevel
-              }`,
+              account.id,
+              eval1.type,
+              eval1[`${eval1.type}ConfidenceLevel`],
+              eval1[`${eval1.type}LesionType`],
+              eval2.type,
+              eval2[`${eval2.type}ConfidenceLevel`],
+              eval2[`${eval2.type}LesionType`],
+              eval2.affectDiagnostic,
+              eval2.affectConfidenceLevel,
+              new Date().toUTCString(),
             ],
           ],
         },
@@ -196,11 +186,12 @@ export async function POST(req: NextRequest) {
       range: `Lesion_Info!A${Number(nextQuestionIndex) + 1}:H${
         Number(nextQuestionIndex) + 1
       }`,
-      spreadsheetId: GOOGLE_DATA_SPREAD_SHEET_ID,
+      spreadsheetId: process.env.GOOGLE_DATA_SPREAD_SHEET_ID as string,
     });
 
     const nextQuestionIndexInListQuestion =
-      currentAnswer.listLesion.split("|").indexOf(nextQuestionIndex) + 1;
+      currentAnswerOverview.listLesion.split("|").indexOf(nextQuestionIndex) +
+      1;
 
     const question = questions.map((item) => {
       return {
