@@ -11,7 +11,7 @@ export async function getDataInRange({
   profileIndex?: number;
 }): Promise<Array<unknown>> {
   try {
-    const sheets = getSheet({ profileIndex });
+    const sheets = getSheetClient({ profileIndex });
     const res = await sheets.spreadsheets.values.get({
       spreadsheetId,
       range,
@@ -46,7 +46,7 @@ export async function writeDataInRange({
   }>;
 }): Promise<unknown> {
   try {
-    const sheets = getSheet({ profileIndex });
+    const sheets = getSheetClient({ profileIndex });
     await sheets.spreadsheets.values.batchUpdate({
       spreadsheetId,
       requestBody: {
@@ -72,7 +72,7 @@ export async function writeDataInRange({
   }
 }
 
-function getSheet({ profileIndex }: { profileIndex: number }) {
+export function getSheetClient({ profileIndex }: { profileIndex: number }) {
   if (profileIndex > Number(process.env.GOOGLE_PROFILE_LENGTH)) {
     throw new Error(
       "Could not connect to server, please try again in a few minutes"

@@ -20,7 +20,7 @@ import {
   Space,
 } from "antd";
 import { Image } from "antd";
-import { FileTextOutlined, LogoutOutlined } from "@ant-design/icons";
+import { LogoutOutlined } from "@ant-design/icons";
 import { useRouter } from "next/navigation";
 import LoadingPage from "../component/LoadingPage";
 import { axiosInstance } from "../axios-instance";
@@ -242,8 +242,9 @@ export default function EvaluationForm() {
       .then((res) => {
         if (res.data?.successAll) {
           router.replace("/result");
+        } else {
+          setQuestionInfo(res.data);
         }
-        setQuestionInfo(res.data);
         form.resetFields();
       })
       .catch(async (e) => {
