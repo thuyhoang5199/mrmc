@@ -37,11 +37,8 @@ const marksBenign: SliderSingleProps["marks"] = {
     },
     label: <strong>High confidence Benign</strong>,
   },
-  10: "10",
-  20: "20",
-  30: "30",
-  40: "40",
-  50: {
+  10: "10", 20: "20", 30: "30", 40: "40", 50: "50", 60: "60", 70: "70", 80: "80", 90: "90",
+  100: {
     style: {
       color: "#9c9006",
       width: "100px",
@@ -53,7 +50,7 @@ const marksBenign: SliderSingleProps["marks"] = {
   },
 };
 const marksMalignant: SliderSingleProps["marks"] = {
-  51: {
+  1: {
     style: {
       color: "#9c9006",
       width: "100px",
@@ -65,10 +62,7 @@ const marksMalignant: SliderSingleProps["marks"] = {
       <strong className={styles.note_slide}>Low confidence Malignant </strong>
     ),
   },
-  60: "60",
-  70: "70",
-  80: "80",
-  90: "90",
+  10: "10", 20: "20", 30: "30", 40: "40", 50: "50", 60: "60", 70: "70", 80: "80", 90: "90",
   100: {
     style: {
       color: "red",
@@ -266,6 +260,10 @@ export default function EvaluationForm() {
         type: "warning",
         content:
           "IMPORTANT NOTE:  For the MRM Study, Actinic Keratosis (AK) is classified as a “malignant” diagnosis",
+        style: {
+          fontSize: "20px",
+          fontWeight: 500,
+        }
       });
     }
   };
@@ -274,15 +272,26 @@ export default function EvaluationForm() {
     messageApi.open({
       type: "success",
       content: "Data is automatically saved",
+      style: {
+        fontSize: "20px",
+        color: "#0d7535",
+        fontWeight: 600
+      }
     });
   };
 
-  const openNotificationWithIcon = () => {
-    api.success({
-      message: "Save Success",
-      description: "Your evaluation process has been saved successfully.",
+  const handleClickSave = () => {
+    messageApi.open({
+      type: "success",
+      content: "Your evaluation process has been saved successfully.",
+      style: {
+        fontSize: "20px",
+        color: "#0d7535",
+        fontWeight: 600
+      }
     });
   };
+
 
   const submitLogout = () => {
     logout(router);
@@ -362,7 +371,7 @@ export default function EvaluationForm() {
             Lesion size:
           </Typography.Title>
           <Typography.Text className={styles.property_value}>
-            {questionInfo.lesionSize}
+            {questionInfo.lesionSize.replace("mm", " mm")}
           </Typography.Text>
         </Typography>
 
@@ -372,7 +381,7 @@ export default function EvaluationForm() {
           className={styles.form_style}
           initialValues={{
             benignConfidenceLevel: "1",
-            malignantConfidenceLevel: "51",
+            malignantConfidenceLevel: "1",
           }}
         >
           {contextHolder}
@@ -386,7 +395,7 @@ export default function EvaluationForm() {
                 alt=""
                 src={
                   questionInfo.lesionAuraResultScreen
-                    ? `${questionInfo.lesionAuraResultScreen}.jpg`
+                    ? `https://mrmc.vercel.app/${questionInfo.lesionAuraResultScreen}.jpg`
                     : undefined
                 }
                 className={styles.img}
@@ -476,9 +485,9 @@ export default function EvaluationForm() {
                   >
                     <Slider
                       marks={marksBenign}
-                      min={1}
-                      max={50}
                       step={1}
+                      min={1}
+                      max={100}
                       tooltip={{
                         open: true,
                       }}
@@ -545,9 +554,7 @@ export default function EvaluationForm() {
                       <label className={styles.label_item}>
                         {" "}
                         {/* Direct label styling */}
-                        <span style={{ color: "red" }}>*</span> Did the AURA
-                        slider bar position affect the confidence level of your
-                        decision? <br />
+                        <span style={{ color: "red" }}>*</span> Did the AURA slider bar position affect the confidence level of your final decision? <br />
                       </label>
                       <Form.Item
                         name="affectConfidenceLevel"
@@ -600,9 +607,9 @@ export default function EvaluationForm() {
                   >
                     <Slider
                       marks={marksMalignant}
-                      min={51}
-                      max={100}
                       step={1}
+                      min={1}
+                      max={100}
                       tooltip={{ open: true }}
                       className={styles.slider_style}
                     />
@@ -665,9 +672,7 @@ export default function EvaluationForm() {
                       <label className={styles.label_item}>
                         {" "}
                         {/* Direct label styling */}
-                        <span style={{ color: "red" }}>*</span> Did the AURA
-                        slider bar position affect the confidence level of your
-                        decision? <br />
+                        <span style={{ color: "red" }}>*</span> Did the AURA slider bar position affect the confidence level of your final decision? <br />
                       </label>
                       <Form.Item
                         name="affectConfidenceLevel"
@@ -708,7 +713,7 @@ export default function EvaluationForm() {
               className={styles.btn}
               loading={isLoading}
               disabled={isLoading}
-              onClick={openNotificationWithIcon}
+              onClick={handleClickSave}
               size="large"
             >
               SAVE

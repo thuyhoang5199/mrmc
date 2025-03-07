@@ -1,6 +1,6 @@
 "use client"; // Explicitly mark this file as a Client Component
 
-import { Button, Form, Input, Typography } from "antd";
+import { Button, Form, Input, Space, Typography } from "antd";
 import { useRouter } from "next/navigation";
 import React from "react";
 import styles from "./page.module.css";
@@ -24,13 +24,23 @@ export default function SignaturePage() {
         <Form.Item label="Date" labelAlign="left">
           <Input />
         </Form.Item>
-        <Button
-          onClick={() => {
-            router.replace("/result");
-          }}
-        >
-          Sign and Completed
-        </Button>
+        <Space>
+          <Button
+            onClick={() => {
+              router.replace("/result");
+            }}
+          >
+            Completed
+          </Button>
+          <Button
+            onClick={() => {
+              router.replace("/result");
+            }}
+          >
+            Save
+          </Button>
+        </Space>
+
       </Form>
     </div>
   );
