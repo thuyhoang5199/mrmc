@@ -4,7 +4,6 @@ import { Button, Form, Space, Typography, Col, Row, Modal, Image } from "antd";
 import { useRouter } from "next/navigation";
 import React, { useRef, useState } from "react";
 import styles from "./page.module.css";
-// @ts-expect-error
 import SignatureCanvas from "react-signature-canvas";
 
 export default function SignaturePage() {
