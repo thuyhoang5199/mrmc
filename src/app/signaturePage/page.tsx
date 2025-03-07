@@ -11,7 +11,7 @@ export default function SignaturePage() {
   const sigCanvas = useRef<SignatureCanvas>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isSigned, setIsSigned] = useState(false);
-  const [img, setImg] = useState(undefined)
+  const [img, setImg] = useState<string | undefined>(undefined)
   const today = new Date()
 
   const day = String(today.getDate()).padStart(2, "0");
