@@ -1,7 +1,10 @@
 .page {
-  background: linear-gradient(rgba(196, 234, 239, 0.95), rgba(255, 255, 255, 0.98));
+  background: linear-gradient(
+    rgba(196, 234, 239, 0.95),
+    rgba(255, 255, 255, 0.98)
+  );
   display: grid;
-  place-items: center; 
+  place-items: center;
 }
 
 .container {
@@ -40,7 +43,7 @@
 }
 
 .form_item {
- margin: 5px 0 20px !important;
+  margin: 5px 0 20px !important;
 }
 
 .label_item {
@@ -50,7 +53,7 @@
 }
 
 .btn {
-  background-color: #13BED8 !important;
+  background-color: #13bed8 !important;
   border-radius: 100px !important;
   color: #fff !important;
   margin-bottom: 60px;
@@ -58,17 +61,16 @@
   font-size: 22px !important;
 }
 .btn:hover {
-  background-color: #067DB2 !important;
+  background-color: #067db2 !important;
   color: #fff !important;
 }
 
 .slider_style {
- margin: 45px 100px 25px !important;
-
+  margin: 45px 100px 25px !important;
 }
 
 .img_gr {
-  display: flex ;
+  display: flex;
   align-items: center;
   /* flex: 1 1; */
   gap: 10px;
@@ -76,9 +78,9 @@
   margin-bottom: 20px;
 }
 
-.img{
+.img {
   height: 320px !important ;
-  width: 100% !important;
+  width: auto !important;
 }
 
 .note_not_img {
@@ -106,7 +108,7 @@
 }
 
 @media (max-width: 1200px) {
-  .img{
+  .img {
     height: 25dvw !important ;
     width: auto !important;
   }
@@ -119,12 +121,11 @@
 @media (max-width: 768px) {
   .container {
     width: 90%;
-    
   }
   .img_gr {
     flex-direction: column;
   }
-  .img{
+  .img {
     height: auto !important;
     width: 100% !important;
   }
