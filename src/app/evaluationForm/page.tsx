@@ -409,7 +409,7 @@ export default function EvaluationForm() {
                 alt=""
                 src={
                   questionInfo.lesionPicture
-                    ? `${questionInfo.lesionPicture}.jpg`
+                    ? `https://mrmc.vercel.app/${questionInfo.lesionPicture}.jpg`
                     : undefined
                 }
                 className={styles.img}
