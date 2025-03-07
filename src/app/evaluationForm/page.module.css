@@ -78,7 +78,7 @@
 
 .img{
   height: 320px !important ;
-  /* width: 495px !important; */
+  width: 100% !important;
 }
 
 .note_not_img {
