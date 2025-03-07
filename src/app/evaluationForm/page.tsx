@@ -37,7 +37,15 @@ const marksBenign: SliderSingleProps["marks"] = {
     },
     label: <strong>High confidence Benign</strong>,
   },
-  10: "10", 20: "20", 30: "30", 40: "40", 50: "50", 60: "60", 70: "70", 80: "80", 90: "90",
+  10: "10",
+  20: "20",
+  30: "30",
+  40: "40",
+  50: "50",
+  60: "60",
+  70: "70",
+  80: "80",
+  90: "90",
   100: {
     style: {
       color: "#9c9006",
@@ -62,7 +70,15 @@ const marksMalignant: SliderSingleProps["marks"] = {
       <strong className={styles.note_slide}>Low confidence Malignant </strong>
     ),
   },
-  10: "10", 20: "20", 30: "30", 40: "40", 50: "50", 60: "60", 70: "70", 80: "80", 90: "90",
+  10: "10",
+  20: "20",
+  30: "30",
+  40: "40",
+  50: "50",
+  60: "60",
+  70: "70",
+  80: "80",
+  90: "90",
   100: {
     style: {
       color: "red",
@@ -190,7 +206,11 @@ export default function EvaluationForm() {
       .get("/api/question")
       .then(async (res) => {
         if (res.data.successAll) {
-          router.replace("/result");
+          if (res.data?.isSignWhenComplete == "False") {
+            router.replace("signaturePage");
+          } else {
+            router.replace("/result");
+          }
         } else {
           setQuestionInfo(res.data);
         }
@@ -240,6 +260,7 @@ export default function EvaluationForm() {
           setQuestionInfo(res.data);
         }
         form.resetFields();
+        success();
       })
       .catch(async (e) => {
         api.success({
@@ -250,7 +271,6 @@ export default function EvaluationForm() {
       .finally(() => {
         setIsLoading(false);
         setSeconds(0);
-        success();
       });
   };
 
@@ -263,7 +283,7 @@ export default function EvaluationForm() {
         style: {
           fontSize: "20px",
           fontWeight: 500,
-        }
+        },
       });
     }
   };
@@ -275,8 +295,8 @@ export default function EvaluationForm() {
       style: {
         fontSize: "20px",
         color: "#0d7535",
-        fontWeight: 600
-      }
+        fontWeight: 600,
+      },
     });
   };
 
@@ -287,11 +307,10 @@ export default function EvaluationForm() {
       style: {
         fontSize: "20px",
         color: "#0d7535",
-        fontWeight: 600
-      }
+        fontWeight: 600,
+      },
     });
   };
-
 
   const submitLogout = () => {
     logout(router);
@@ -554,7 +573,9 @@ export default function EvaluationForm() {
                       <label className={styles.label_item}>
                         {" "}
                         {/* Direct label styling */}
-                        <span style={{ color: "red" }}>*</span> Did the AURA slider bar position affect the confidence level of your final decision? <br />
+                        <span style={{ color: "red" }}>*</span> Did the AURA
+                        slider bar position affect the confidence level of your
+                        final decision? <br />
                       </label>
                       <Form.Item
                         name="affectConfidenceLevel"
@@ -672,7 +693,9 @@ export default function EvaluationForm() {
                       <label className={styles.label_item}>
                         {" "}
                         {/* Direct label styling */}
-                        <span style={{ color: "red" }}>*</span> Did the AURA slider bar position affect the confidence level of your final decision? <br />
+                        <span style={{ color: "red" }}>*</span> Did the AURA
+                        slider bar position affect the confidence level of your
+                        final decision? <br />
                       </label>
                       <Form.Item
                         name="affectConfidenceLevel"

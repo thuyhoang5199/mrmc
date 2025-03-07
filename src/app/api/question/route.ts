@@ -13,17 +13,19 @@ export async function GET() {
     return account;
   }
 
+  const accountIndex = Number(account.index);
+
   const answersOverview = await getDataInRange({
-    range: "Answer_Overview!A:C",
+    range: `Answer_Overview!A${accountIndex + 1}:F${accountIndex + 1}`,
     spreadsheetId: process.env.GOOGLE_DATA_SPREAD_SHEET_ID as string,
   });
-  answersOverview.shift();
 
   const answersOverviewFormatted = answersOverview.map((item) => {
     return {
       accountId: get(item, "0", ""),
       listLesion: get(item, "1", ""),
       currentLesion: get(item, "2", 0),
+      isSignWhenComplete: get(item, "5", "False"),
     };
   });
   const currentAnswer = answersOverviewFormatted.find(
@@ -43,14 +45,22 @@ export async function GET() {
     }
     listLesion = listLesion.sort(() => Math.random() - 0.5);
 
-    const nextIndexToWrite = answersOverview.length + 2;
     nextQuestionIndex = listLesion[0];
     await writeDataInRange({
       spreadsheetId: process.env.GOOGLE_DATA_SPREAD_SHEET_ID as string,
       data: [
         {
-          range: `Answer_Overview!A${nextIndexToWrite}:D${nextIndexToWrite}`,
-          values: [[account.id, listLesion.join("|"), nextQuestionIndex, "0"]],
+          range: `Answer_Overview!A${accountIndex + 1}:F${accountIndex + 1}`,
+          values: [
+            [
+              account.id,
+              listLesion.join("|"),
+              nextQuestionIndex,
+              "0",
+              "",
+              "False",
+            ],
+          ],
         },
       ],
     });
@@ -61,7 +71,13 @@ export async function GET() {
         .split("|")
         .indexOf(nextQuestionIndex.toString()) + 1;
     if (nextQuestionIndex == -1) {
-      return NextResponse.json({ successAll: true }, { status: 200 });
+      return NextResponse.json(
+        {
+          isSignWhenComplete: currentAnswer.isSignWhenComplete,
+          successAll: true,
+        },
+        { status: 200 }
+      );
     }
   }
 
@@ -102,12 +118,13 @@ export async function POST(req: NextRequest) {
     return account;
   }
 
+  const accountIndex = Number(account.index);
+
   const LESION_LENGTH = Number(process.env.LESION_LENGTH);
   const answersOverview = await getDataInRange({
-    range: "Answer_Overview!A:C",
+    range: `Answer_Overview!A${accountIndex + 1}:C${accountIndex + 1}`,
     spreadsheetId: process.env.GOOGLE_DATA_SPREAD_SHEET_ID as string,
   });
-  answersOverview.shift();
 
   const answersOverviewFormatted = answersOverview.map((item) => {
     return {
@@ -145,20 +162,17 @@ export async function POST(req: NextRequest) {
       100
     ).toFixed(2);
 
-    const currentAnswerOverviewIndex =
-      answersOverviewFormatted.indexOf(currentAnswerOverview) + 2; // +1 to goto index in excel, +2 because 2 shift
-
     await writeDataInRange({
       spreadsheetId: process.env.GOOGLE_DATA_SPREAD_SHEET_ID as string,
       data: [
         {
           values: [[nextQuestionIndex || "-1", percent]],
-          range: `Answer_Overview!C${currentAnswerOverviewIndex}:D${currentAnswerOverviewIndex}`,
+          range: `Answer_Overview!C${accountIndex + 1}:D${accountIndex + 1}`,
         },
         {
           range: `Answer_Lesion_${currentAnswerOverview.currentLesion}!A${
-            currentAnswerOverviewIndex + 1
-          }:J${currentAnswerOverviewIndex + 1}`,
+            accountIndex + 2
+          }:J${accountIndex + 2}`,
           values: [
             [
               account.id,
@@ -179,7 +193,13 @@ export async function POST(req: NextRequest) {
 
     //done all lesion
     if (!nextQuestionIndex) {
-      return NextResponse.json({ successAll: true }, { status: 200 });
+      return NextResponse.json(
+        {
+          isSignWhenComplete: "False",
+          successAll: true,
+        },
+        { status: 200 }
+      );
     }
 
     const questions = await getDataInRange({

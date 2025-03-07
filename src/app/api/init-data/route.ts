@@ -1,5 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getSheetClient } from "../utils/google/common";
+import {
+  getDataInRange,
+  getSheetClient,
+  writeDataInRange,
+} from "../utils/google/common";
 
 export async function POST(req: NextRequest) {
   const accessToken = req.headers.get("x-access-token");
@@ -24,6 +28,8 @@ export async function POST(req: NextRequest) {
     spreadsheetId,
     includeGridData: false,
   });
+
+  //#region  init sheet answer lesion
   if (Number(spreadsheet.data.sheets?.length) <= 4) {
     const answerLesion = spreadsheet.data.sheets?.find(
       (i) => i.properties?.title == "Answer_Lesion_1"
@@ -49,6 +55,56 @@ export async function POST(req: NextRequest) {
       },
     });
   }
+  //#endregion
+
+  //#region generate lesion answer overview
+  const sheetLoginManager = await getDataInRange({
+    range: "Login_Manage!A:C",
+    spreadsheetId,
+  });
+
+  const sheetAnswerOverview = await getDataInRange({
+    range: "Answer_Overview!A:A",
+    spreadsheetId,
+  });
+
+  // console.log(sheetLoginManager);
+
+  if (sheetAnswerOverview.length != sheetLoginManager.length) {
+    const LESION_LENGTH = Number(process.env.LESION_LENGTH);
+    sheetLoginManager.shift();
+    const answerOverviewData = sheetLoginManager.map((item) => {
+      let index = 1;
+      let listLesion: number[] = [];
+      while (index <= LESION_LENGTH) {
+        listLesion.push(index);
+        index += 1;
+      }
+      listLesion = listLesion.sort(() => Math.random() - 0.5);
+      const nextQuestionIndex = listLesion[0];
+      return [
+        item[2],
+        listLesion.join("|"),
+        nextQuestionIndex,
+        "0",
+        "",
+        "False",
+      ];
+    });
+
+    await writeDataInRange({
+      spreadsheetId,
+      data: [
+        {
+          range: `Answer_Overview!A2:F${answerOverviewData.length + 2}`,
+          values: answerOverviewData,
+        },
+      ],
+    });
+  }
+
+  //#endregion
+
   return NextResponse.json(
     {
       success: true,

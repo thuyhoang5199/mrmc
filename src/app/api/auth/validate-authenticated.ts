@@ -22,6 +22,7 @@ export function validateAuthenticated({ token }: { token: string | null }) {
       username: decode.username,
       id: decode.id,
       name: decode.name,
+      index: decode.index,
     };
   } catch (e) {
     console.log("validate token error: ", e);
