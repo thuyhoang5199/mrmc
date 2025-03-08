@@ -13,7 +13,7 @@ export async function POST(req: NextRequest) {
     return account;
   }
   const filePath = `signature_${account.id}.png`;
-  fs.writeFileSync(`/${filePath}`, signature, "base64");
+  fs.writeFileSync(`./${filePath}`, signature, "base64");
 
   const readStream = fs.createReadStream(filePath);
 
