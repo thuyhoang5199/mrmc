@@ -45,7 +45,7 @@ export async function POST(req: NextRequest) {
     spreadsheetId: process.env.GOOGLE_DATA_SPREAD_SHEET_ID as string,
     data: [
       {
-        values: [["True", new Date().toUTCString(), `${filePath}.png`]],
+        values: [["True", new Date().toUTCString(), filePath]],
         range: `Answer_Overview!F${accountIndex + 1}:H${accountIndex + 1}`,
       },
     ],
