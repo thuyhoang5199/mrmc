@@ -1,3 +1,4 @@
+import { get } from "lodash";
 import { NextRequest, NextResponse } from "next/server";
 import {
   getDataInRange,
@@ -83,7 +84,7 @@ export async function POST(req: NextRequest) {
       listLesion = listLesion.sort(() => Math.random() - 0.5);
       const nextQuestionIndex = listLesion[0];
       return [
-        item[2],
+        get(item, "2"),
         listLesion.join("|"),
         nextQuestionIndex,
         "0",
