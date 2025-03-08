@@ -13,9 +13,9 @@ export async function POST(req: NextRequest) {
     return account;
   }
   const filePath = `signature_${account.id}.png`;
-  fs.writeFileSync(`./${filePath}`, signature, "base64");
+  fs.writeFileSync(`/tmp/${filePath}`, signature, "base64");
 
-  const readStream = fs.createReadStream(filePath);
+  const readStream = fs.createReadStream(`/tmp/${filePath}`);
 
   readStream.pipe(process.stdout);
 
@@ -28,7 +28,7 @@ export async function POST(req: NextRequest) {
       },
       media: { mimeType: "image/png", body: readStream },
     });
-    fs.unlinkSync(filePath);
+    fs.unlinkSync(`/tmp/${filePath}`);
   } catch (err) {
     console.log("Save signature error", err);
     return NextResponse.json(
