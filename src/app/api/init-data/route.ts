@@ -69,8 +69,6 @@ export async function POST(req: NextRequest) {
     spreadsheetId,
   });
 
-  // console.log(sheetLoginManager);
-
   if (sheetAnswerOverview.length != sheetLoginManager.length) {
     const LESION_LENGTH = Number(process.env.LESION_LENGTH);
     sheetLoginManager.shift();

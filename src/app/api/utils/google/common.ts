@@ -1,6 +1,7 @@
 import { google } from "googleapis";
 import { get } from "lodash";
 
+//#region Google sheet
 export async function getDataInRange({
   range,
   spreadsheetId,
@@ -99,9 +100,6 @@ export function getSheetClient({ profileIndex }: { profileIndex: number }) {
   return sheets;
 }
 
-export const sleep = (ms: number): Promise<void> =>
-  new Promise((resolve) => setTimeout(resolve, ms));
-
 export function getColumnNameByIndex(n: number) {
   const ordA = "A".charCodeAt(0);
   const ordZ = "Z".charCodeAt(0);
@@ -114,3 +112,37 @@ export function getColumnNameByIndex(n: number) {
   }
   return s;
 }
+//#endregion
+
+//#region Google drive
+
+export function getDriveClient({ profileIndex }: { profileIndex: number }) {
+  if (profileIndex > Number(process.env.GOOGLE_PROFILE_LENGTH)) {
+    throw new Error(
+      "Could not connect to server, please try again in a few minutes"
+    );
+  }
+  const credentials = {
+    type: "service_account",
+    project_id: process.env[`GOOGLE_PROFILE_PROJECT_ID_${profileIndex}`],
+    private_key_id:
+      process.env[`GOOGLE_PROFILE_PRIVATE_KEY_ID_${profileIndex}`],
+    private_key: process.env[
+      `GOOGLE_PROFILE_PRIVATE_KEY_${profileIndex}`
+    ]?.replace(/\\n/g, "\n"),
+    client_email: process.env[`GOOGLE_PROFILE_CLIENT_EMAIL_${profileIndex}`],
+    client_id: process.env[`GOOGLE_PROFILE_CLIENT_ID_${profileIndex}`],
+    universe_domain: "googleapis.com",
+  };
+  const auth = new google.auth.GoogleAuth({
+    credentials: credentials,
+    scopes: ["https://www.googleapis.com/auth/drive"],
+  });
+
+  const sheets = google.drive({ version: "v3", auth: auth });
+  return sheets;
+}
+//#endregion
+
+export const sleep = (ms: number): Promise<void> =>
+  new Promise((resolve) => setTimeout(resolve, ms));

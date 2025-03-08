@@ -1,16 +1,20 @@
 "use client"; // Explicitly mark this file as a Client Component
 
-import { Button, Form, Space, Typography, Image } from "antd";
+import { Button, Form, Space, Typography, Image, notification } from "antd";
 import { useRouter } from "next/navigation";
 import React, { useRef, useState } from "react";
 import styles from "./page.module.css";
 import SignatureCanvas from "react-signature-canvas";
+import { axiosInstance } from "../axios-instance";
+import LoadingPage from "../component/LoadingPage";
 
 export default function SignaturePage() {
   const router = useRouter();
   const sigCanvas = useRef<SignatureCanvas>(null);
   const [isSigned, setIsSigned] = useState(false);
   const today = new Date();
+  const [api] = notification.useNotification();
+  const [isLoading, setIsLoading] = useState(false);
 
   const day = String(today.getDate()).padStart(2, "0");
   const month = String(today.getMonth() + 1).padStart(2, "0");
@@ -28,8 +32,30 @@ export default function SignaturePage() {
   const saveSignature = () => {
     if (sigCanvas.current) {
       const dataURL = sigCanvas.current.toDataURL(); // Lấy dữ liệu chữ ký dưới dạng ảnh
-      console.log("Chữ ký dưới dạng hình ảnh:", dataURL);
       // Bạn có thể lưu dataURL vào máy chủ hoặc hiển thị nó cho người dùng
+      axiosInstance(router)
+        .post("/api/signature", {
+          signature: dataURL.replace(/^data:image\/png;base64,/, ""),
+        })
+        .then((res) => {
+          if (res.data?.successAll) {
+            router.replace("/result");
+          }
+        })
+        .catch(async (e) => {
+          api.success({
+            message: "Save error",
+            description: e.message,
+          });
+        })
+        .finally(() => {
+          setIsLoading(false);
+        });
+    } else {
+      api.error({
+        message: "Save error",
+        description: "Signature empty",
+      });
     }
   };
 
@@ -131,6 +157,7 @@ export default function SignaturePage() {
           </Form>
         </Typography>
       </div>
+      {isLoading && <LoadingPage />}
     </div>
   );
 }

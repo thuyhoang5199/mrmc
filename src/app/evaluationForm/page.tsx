@@ -157,6 +157,8 @@ export default function EvaluationForm() {
   const [api, contextHolderNotificationSave] = notification.useNotification();
 
   const [seconds, setSeconds] = useState(0);
+  const [startTime, setStartTime] = useState<string | undefined>(undefined);
+
   const [isLogoutOpen, setIsLogoutOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [questionInfo, setQuestionInfo] = useState({
@@ -205,6 +207,7 @@ export default function EvaluationForm() {
     axiosInstance(router)
       .get("/api/question")
       .then(async (res) => {
+        setStartTime(new Date().toUTCString());
         if (res.data.successAll) {
           if (res.data?.isSignWhenComplete == "False") {
             router.replace("signaturePage");
@@ -249,10 +252,10 @@ export default function EvaluationForm() {
     }
   };
 
-  const onFinish = (values: unknown) => {
+  const onFinish = (values: object) => {
     setIsLoading(true);
     axiosInstance(router)
-      .post("/api/question", values)
+      .post("/api/question", { ...values, startTime })
       .then((res) => {
         if (res.data?.successAll) {
           router.replace("/signaturePage");
@@ -269,6 +272,7 @@ export default function EvaluationForm() {
         });
       })
       .finally(() => {
+        setStartTime(new Date().toUTCString());
         setIsLoading(false);
         setSeconds(0);
       });

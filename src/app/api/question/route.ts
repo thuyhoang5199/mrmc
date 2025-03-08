@@ -110,7 +110,7 @@ export async function GET() {
 
 export async function POST(req: NextRequest) {
   const cookie = (await cookies()).get("session")?.value;
-  const { eval1, eval2 } = await req.json();
+  const { eval1, eval2, startTime } = await req.json();
   const account = validateAuthenticated({
     token: cookie as string,
   });
@@ -162,17 +162,38 @@ export async function POST(req: NextRequest) {
       100
     ).toFixed(2);
 
+    const endTime = new Date();
+    const startTimeParse = new Date(startTime);
+
+    const diffMs = endTime.getTime() - startTimeParse.getTime(); // milliseconds between now & Christmas
+    const diffDays = Math.floor(diffMs / 86400000); // days
+    const diffHrs = Math.floor((diffMs % 86400000) / 3600000); // hours
+    const diffMins = Math.round(((diffMs % 86400000) % 3600000) / 60000); // minutes
+    const diffSecond = Math.round(
+      (((diffMs % 86400000) % 3600000) % 60000) / 1000
+    ); // minutes
+    const diffTime = `${diffDays != 0 ? diffDays + " days " : ""}
+    ${diffHrs != 0 ? diffHrs + " hours " : ""}
+    ${diffMins != 0 ? diffMins + " minutes " : ""}
+    ${diffSecond != 0 ? diffSecond + " seconds " : ""}`;
+
     await writeDataInRange({
       spreadsheetId: process.env.GOOGLE_DATA_SPREAD_SHEET_ID as string,
       data: [
         {
-          values: [[nextQuestionIndex || "-1", percent]],
-          range: `Answer_Overview!C${accountIndex + 1}:D${accountIndex + 1}`,
+          values: [
+            [
+              nextQuestionIndex || "-1",
+              percent,
+              nextQuestionIndex ? "" : new Date().toUTCString(),
+            ],
+          ],
+          range: `Answer_Overview!C${accountIndex + 1}:E${accountIndex + 1}`,
         },
         {
           range: `Answer_Lesion_${currentAnswerOverview.currentLesion}!A${
             accountIndex + 2
-          }:J${accountIndex + 2}`,
+          }:L${accountIndex + 2}`,
           values: [
             [
               account.id,
@@ -184,7 +205,9 @@ export async function POST(req: NextRequest) {
               eval2[`${eval2.type}LesionType`],
               eval2.affectDiagnostic,
               eval2.affectConfidenceLevel,
-              new Date().toUTCString(),
+              startTime,
+              endTime.toUTCString(),
+              diffTime,
             ],
           ],
         },
