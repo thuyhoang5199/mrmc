@@ -84,9 +84,9 @@ export async function POST(req: NextRequest) {
       listLesion = listLesion.sort(() => Math.random() - 0.5);
       const nextQuestionIndex = listLesion[0];
       return [
-        get(item, "2"),
+        get(item, "2", ""),
         listLesion.join("|"),
-        nextQuestionIndex,
+        nextQuestionIndex.toString(),
         "0",
         "",
         "False",
