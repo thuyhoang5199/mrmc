@@ -279,7 +279,7 @@ export default function EvaluationForm() {
       messageApi.open({
         type: "warning",
         content:
-          "IMPORTANT NOTE:  For the MRM Study, Actinic Keratosis (AK) is classified as a “malignant” diagnosis",
+          "IMPORTANT NOTE:  For the MRMC Study, Actinic Keratosis (AK) is classified as a “malignant” diagnosis",
         style: {
           fontSize: "20px",
           fontWeight: 500,
