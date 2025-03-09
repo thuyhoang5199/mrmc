@@ -75,7 +75,7 @@ export default function Home() {
                 pattern:
                   /^(?=.*[a-zA-Z])(?=.*\d)(?=.*[!@#$%^&*(),.?":{}|<>]).{8,}$/,
                 message:
-                  "Password must contain at least one letter, one number, and one special character!",
+                  "Password must contain at least one letter, one number, and one special character and min 8 character!",
               },
             ]}
             hasFeedback

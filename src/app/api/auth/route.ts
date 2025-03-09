@@ -69,7 +69,7 @@ export async function POST(req: Request) {
     sendEmail({
       email: account.email,
       subject: "MRMC Vita Login verify code",
-      content: `<div><p>Dear ${account.name},</p><p>Your passcode is <p>${passcode}</p>. Please enter this code into the email confirmation screen.</p></div>`,
+      content: `<div><p>Dear ${account.name},</p><p>Your passcode is <b>${passcode}</b>. Please enter this code into the email confirmation screen.</p></div>`,
     }),
     writeDataInRange({
       spreadsheetId,
