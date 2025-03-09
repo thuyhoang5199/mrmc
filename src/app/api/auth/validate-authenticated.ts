@@ -25,7 +25,7 @@ export function validateAuthenticated({
       process.env.JWT_SECRET_KEY as string
     ) as JwtPayload;
 
-    if (!clientURL.includes(decode.nextRouter)) {
+    if (clientURL[0] != "*" && !clientURL.includes(decode.nextRouter)) {
       const response = NextResponse.json(
         {
           message: "unauthenticated",
@@ -41,6 +41,7 @@ export function validateAuthenticated({
       id: decode.id,
       name: decode.name,
       index: decode.index,
+      email: decode.email,
     };
   } catch (e) {
     console.log("validate token error: ", e);

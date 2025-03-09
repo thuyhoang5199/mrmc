@@ -3,7 +3,7 @@
 import React, { useState } from "react";
 import styles from "./page.module.css";
 import type { FormProps } from "antd";
-import { Button, Form, Input, Typography } from "antd";
+import { Alert, Button, Form, Input, Typography } from "antd";
 import { useRouter } from "next/navigation";
 import { axiosInstance } from "../axios-instance";
 
@@ -49,19 +49,25 @@ export default function Home() {
       <main className={styles.main}>
         <Form
           name="login"
-          labelCol={{ span: 10 }}
-          wrapperCol={{ span: 14 }}
+          labelCol={{ span: 8 }}
+          wrapperCol={{ span: 16 }}
           className={styles.form_login}
           initialValues={{ remember: true }}
+          size="large"
           onFinish={onFinish}
           onFinishFailed={onFinishFailed}
           autoComplete="off"
           form={form}
         >
-          <Typography.Title level={5} className={styles.title}>
-            Welcome to <br />
-            the Multi-Reader Multi-Case (MRMC) Study
+          <Typography.Title level={4} className={styles.title}>
+            Welcome to Vita Imaging’s <br />
+            MRMC (Multi-Reader Multi-Case) Study
           </Typography.Title>
+          <Typography.Title level={5} >
+            Please create your password to get started.
+          </Typography.Title>
+          <Alert message="Your new password must be at least 8 characters and must contain one lowercase, one uppercase letter, one number and one special character." type="warning" style={{ textAlign: "left", marginBottom: 20, marginTop: 20 }} />
+
           <Form.Item
             name="password"
             label="Password"
@@ -75,7 +81,7 @@ export default function Home() {
                 pattern:
                   /^(?=.*[a-zA-Z])(?=.*\d)(?=.*[!@#$%^&*(),.?":{}|<>]).{8,}$/,
                 message:
-                  "Password must contain at least one letter, one number, and one special character and min 8 character!",
+                  "Password format is wrong ",
               },
             ]}
             hasFeedback
@@ -99,7 +105,7 @@ export default function Home() {
                     return Promise.resolve();
                   }
                   return Promise.reject(
-                    new Error("The new password that you entered do not match!")
+                    new Error("The new password does not match!")
                   );
                 },
               }),
@@ -114,6 +120,7 @@ export default function Home() {
             block
             loading={isLoading}
             disabled={isLoading}
+            style={{ marginTop: 10 }}
           >
             {isLoading ? "Changing..." : "Submit"}
           </Button>

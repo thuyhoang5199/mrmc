@@ -6,6 +6,7 @@ import type { FormProps } from "antd";
 import { Button, Form, Input, Typography } from "antd";
 import { useRouter } from "next/navigation";
 import { axiosInstance } from "./axios-instance";
+import Link from "next/link";
 
 type FieldType = {
   username?: string;
@@ -59,10 +60,11 @@ export default function Home() {
           onFinishFailed={onFinishFailed}
           autoComplete="off"
           form={form}
+          size="large"
         >
-          <Typography.Title level={5} className={styles.title}>
-            Welcome to <br />
-            the Multi-Reader Multi-Case (MRMC) Study
+          <Typography.Title level={4} className={styles.title}>
+            Welcome to Vita Imaging’s <br />
+            MRMC (Multi-Reader Multi-Case) Study
           </Typography.Title>
           <Form.Item<FieldType>
             label="Username"
@@ -88,9 +90,11 @@ export default function Home() {
             block
             loading={isLoading}
             disabled={isLoading}
+            style={{ marginBottom: 15 }}
           >
             {isLoading ? "Signing In..." : "SIGN IN"}
           </Button>
+          <Link type="link" href={'forgotPassword'}>Forgot Password</Link>
         </Form>
       </main>
     </div>

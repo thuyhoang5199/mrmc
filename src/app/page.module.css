@@ -51,7 +51,7 @@
 }
 
 .form_login {
-  max-width: 600px; /* Điều chỉnh chiều rộng theo ý muốn */
+  width: 550px; /* Điều chỉnh chiều rộng theo ý muốn */
   text-align: center;
   padding: 90px 20px 30px 20px !important;
   border: 2px solid transparent; /* Đường viền màu xám nhạt */

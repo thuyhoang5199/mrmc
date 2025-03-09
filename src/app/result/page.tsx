@@ -1,7 +1,7 @@
 "use client"; // Explicitly mark this file as a Client Component
 
 import React from "react";
-import { Result, Image } from "antd";
+import { Image } from "antd";
 import styles from "./page.module.css";
 
 export default function ResultPage() {

@@ -14,6 +14,7 @@ export function returnWithNewToken({
     id: string;
     name: string;
     index: string;
+    email: string;
   };
   nextRouter:
     | "/changePassword"
@@ -31,6 +32,7 @@ export function returnWithNewToken({
       name: account.name,
       index: account.index,
       nextRouter: nextRouter,
+      email: account.email,
     },
     process.env.JWT_SECRET_KEY as string,
     { expiresIn: expiredIn }
