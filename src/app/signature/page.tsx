@@ -43,7 +43,7 @@ export default function SignaturePage() {
           }
         })
         .catch(async (e) => {
-          api.success({
+          api.error({
             message: "Save error",
             description: e.message,
           });
@@ -137,11 +137,10 @@ export default function SignaturePage() {
             <Form.Item className={styles.center_buttons}>
               <Space>
                 <Button
-                  onClick={() => {
-                    router.replace("/result");
-                  }}
+                  onClick={saveSignature}
                   disabled={!isSigned}
                   className={styles.btn}
+                  loading={isLoading}
                 >
                   Completed
                 </Button>
@@ -149,6 +148,7 @@ export default function SignaturePage() {
                   onClick={saveSignature}
                   disabled={!isSigned}
                   className={styles.btn}
+                  loading={isLoading}
                 >
                   Save
                 </Button>

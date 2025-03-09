@@ -1,13 +1,15 @@
 import { get } from "lodash";
 import { NextRequest, NextResponse } from "next/server";
 import { validateAuthenticated } from "../auth/validate-authenticated";
-import { getDataInRange, writeDataInRange } from "../utils/google/common";
+import { getDataInRange, writeDataInRange } from "../utils/google";
 import { cookies } from "next/headers";
+import { returnWithNewToken } from "../auth/return-with-new-token";
 
 export async function GET() {
   const cookie = (await cookies()).get("session")?.value;
   const account = validateAuthenticated({
     token: cookie as string,
+    clientURL: ["/evaluationForm"],
   });
   if (account instanceof NextResponse) {
     return account;
@@ -71,13 +73,17 @@ export async function GET() {
         .split("|")
         .indexOf(nextQuestionIndex.toString()) + 1;
     if (nextQuestionIndex == -1) {
-      return NextResponse.json(
-        {
+      return returnWithNewToken({
+        account,
+        nextRouter:
+          currentAnswer.isSignWhenComplete == "False"
+            ? "/signature"
+            : "/result",
+        responseData: {
           isSignWhenComplete: currentAnswer.isSignWhenComplete,
           successAll: true,
         },
-        { status: 200 }
-      );
+      });
     }
   }
 
@@ -113,6 +119,7 @@ export async function POST(req: NextRequest) {
   const { eval1, eval2, startTime } = await req.json();
   const account = validateAuthenticated({
     token: cookie as string,
+    clientURL: ["/evaluationForm"],
   });
   if (account instanceof NextResponse) {
     return account;
@@ -216,13 +223,14 @@ export async function POST(req: NextRequest) {
 
     //done all lesion
     if (!nextQuestionIndex) {
-      return NextResponse.json(
-        {
+      return returnWithNewToken({
+        account,
+        nextRouter: "/signature",
+        responseData: {
           isSignWhenComplete: "False",
           successAll: true,
         },
-        { status: 200 }
-      );
+      });
     }
 
     const questions = await getDataInRange({

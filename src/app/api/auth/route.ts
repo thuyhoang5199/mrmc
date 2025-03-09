@@ -1,9 +1,10 @@
-import jwt from "jsonwebtoken";
 import { NextResponse } from "next/server";
-import { EXPIRED_TIME } from "../constants";
-import { getDataInRange } from "../utils/google/common";
+import { getDataInRange, writeDataInRange } from "../utils/google";
 import { get } from "lodash";
-import { serialize } from "cookie";
+import { sendEmail } from "../utils/mail";
+import { encrypt } from "../utils/cipher";
+import dayjs from "dayjs";
+import { returnWithNewToken } from "./return-with-new-token";
 
 export async function POST(req: Request) {
   const { username, password } = await req.json();
@@ -15,10 +16,11 @@ export async function POST(req: Request) {
       { status: 400 }
     );
   }
+  const spreadsheetId = process.env.GOOGLE_DATA_SPREAD_SHEET_ID as string;
 
   const accounts = await getDataInRange({
-    range: "Login_Manage!A:E",
-    spreadsheetId: process.env.GOOGLE_DATA_SPREAD_SHEET_ID as string,
+    range: "Login_Manage!A:G",
+    spreadsheetId,
   });
 
   accounts.shift();
@@ -30,6 +32,8 @@ export async function POST(req: Request) {
       id: get(item, "2", ""),
       username: get(item, "3", ""),
       password: get(item, "4", ""),
+      email: get(item, "5", ""),
+      isDefaultPassword: get(item, "6", ""),
     };
   });
   const account = accountFormatted.find((item) => item.username == username);
@@ -39,32 +43,52 @@ export async function POST(req: Request) {
       { message: "Username incorrect" },
       { status: 401 }
     );
-  } else if (account.password != password) {
-    return NextResponse.json(
-      { message: "Password incorrect" },
-      { status: 401 }
-    );
+  } else if (account.isDefaultPassword == "True") {
+    if (password != account.password) {
+      return NextResponse.json(
+        { message: "Password incorrect" },
+        { status: 401 }
+      );
+    }
+  } else {
+    const hashPassword = encrypt({ data: password });
+    if (hashPassword != account.password)
+      return NextResponse.json(
+        { message: "Password incorrect" },
+        { status: 401 }
+      );
   }
 
-  const token = jwt.sign(
-    {
-      username,
-      id: account.id,
-      name: account.name,
-      index: account.index,
-    },
-    process.env.JWT_SECRET_KEY as string,
-    { expiresIn: EXPIRED_TIME }
-  );
+  const passcode = Math.ceil(Math.random() * 99999)
+    .toString()
+    .padStart(6, "0");
+  const hashPasscode = encrypt({ data: passcode });
+  const OTPExpired = dayjs().add(5, "minute").toDate().toUTCString();
 
-  const cookie = serialize("session", token, {
-    httpOnly: true,
-    secure: true,
-    maxAge: 60 * 60 * 24 * 7, // One week
-    path: "/",
+  await Promise.allSettled([
+    sendEmail({
+      email: account.email,
+      subject: "MRMC Vita Login verify code",
+      content: `<div><p>Dear ${account.name},</p><p>Your passcode is <p>${passcode}</p>. Please enter this code into the email confirmation screen.</p></div>`,
+    }),
+    writeDataInRange({
+      spreadsheetId,
+      data: [
+        {
+          range: `Login_Manage!H${Number(account.index) + 1}:I${
+            Number(account.index) + 1
+          }`,
+          values: [[hashPasscode, OTPExpired]],
+        },
+      ],
+    }),
+  ]);
+
+  const expiredIn = 5 * 60 * 60;
+  return returnWithNewToken({
+    account,
+    nextRouter: "/verifyOTP",
+    expiredIn,
+    responseData: {},
   });
-  return NextResponse.json(
-    { token },
-    { status: 200, headers: { "Set-Cookie": cookie } }
-  );
 }

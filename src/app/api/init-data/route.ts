@@ -4,7 +4,7 @@ import {
   getDataInRange,
   getSheetClient,
   writeDataInRange,
-} from "../utils/google/common";
+} from "../utils/google";
 
 export async function POST(req: NextRequest) {
   const accessToken = req.headers.get("x-access-token");

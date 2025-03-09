@@ -1,7 +1,13 @@
 import { NextResponse } from "next/server";
 import jwt, { JwtPayload } from "jsonwebtoken";
 
-export function validateAuthenticated({ token }: { token: string | null }) {
+export function validateAuthenticated({
+  token,
+  clientURL,
+}: {
+  token: string | null;
+  clientURL: string[];
+}) {
   try {
     if (!token) {
       const response = NextResponse.json(
@@ -18,6 +24,18 @@ export function validateAuthenticated({ token }: { token: string | null }) {
       token,
       process.env.JWT_SECRET_KEY as string
     ) as JwtPayload;
+
+    if (!clientURL.includes(decode.nextRouter)) {
+      const response = NextResponse.json(
+        {
+          message: "unauthenticated",
+        },
+        { status: 401 }
+      );
+      response.cookies.delete("session");
+      return response;
+    }
+
     return {
       username: decode.username,
       id: decode.id,

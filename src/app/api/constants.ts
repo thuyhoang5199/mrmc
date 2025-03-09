@@ -1,1 +1,1 @@
-export const EXPIRED_TIME = "1 weeks";
+export const EXPIRED_TIME = 60 * 60 * 24 * 7;

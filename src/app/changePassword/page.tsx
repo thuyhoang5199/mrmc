@@ -5,10 +5,9 @@ import styles from "./page.module.css";
 import type { FormProps } from "antd";
 import { Button, Form, Input, Typography } from "antd";
 import { useRouter } from "next/navigation";
-import { axiosInstance } from "./axios-instance";
+import { axiosInstance } from "../axios-instance";
 
 type FieldType = {
-  username?: string;
   password?: string;
 };
 
@@ -20,17 +19,16 @@ export default function Home() {
   const onFinish: FormProps<FieldType>["onFinish"] = async (values) => {
     setIsLoading(true);
     await axiosInstance(router)
-      .post("/api/auth", {
-        username: values.username,
+      .post("/api/auth/change-password", {
         password: values.password,
       })
       .then(() => {
-        router.replace("/verifyOTP");
+        router.replace("/evaluationForm");
       })
       .catch((error) => {
         form.setFields([
           {
-            name: "password",
+            name: "confirm",
             errors: [error.message || "Something when wrong"],
           },
         ]);
@@ -51,8 +49,8 @@ export default function Home() {
       <main className={styles.main}>
         <Form
           name="login"
-          labelCol={{ span: 8 }}
-          wrapperCol={{ span: 16 }}
+          labelCol={{ span: 10 }}
+          wrapperCol={{ span: 14 }}
           className={styles.form_login}
           initialValues={{ remember: true }}
           onFinish={onFinish}
@@ -64,20 +62,48 @@ export default function Home() {
             Welcome to <br />
             the Multi-Reader Multi-Case (MRMC) Study
           </Typography.Title>
-          <Form.Item<FieldType>
-            label="Username"
-            name="username"
-            rules={[{ required: true, message: "Please input your username!" }]}
-            labelAlign="left"
-          >
-            <Input />
-          </Form.Item>
-
-          <Form.Item<FieldType>
-            label="Password"
+          <Form.Item
             name="password"
-            rules={[{ required: true, message: "Please input your password!" }]}
+            label="Password"
             labelAlign="left"
+            rules={[
+              {
+                required: true,
+                message: "Please input your password!",
+              },
+              {
+                pattern:
+                  /^(?=.*[a-zA-Z])(?=.*\d)(?=.*[!@#$%^&*(),.?":{}|<>]).{8,}$/,
+                message:
+                  "Password must contain at least one letter, one number, and one special character!",
+              },
+            ]}
+            hasFeedback
+          >
+            <Input.Password />
+          </Form.Item>
+          <Form.Item
+            name="confirm"
+            label="Confirm Password"
+            dependencies={["password"]}
+            hasFeedback
+            labelAlign="left"
+            rules={[
+              {
+                required: true,
+                message: "Please confirm your password!",
+              },
+              ({ getFieldValue }) => ({
+                validator(_, value) {
+                  if (!value || getFieldValue("password") === value) {
+                    return Promise.resolve();
+                  }
+                  return Promise.reject(
+                    new Error("The new password that you entered do not match!")
+                  );
+                },
+              }),
+            ]}
           >
             <Input.Password />
           </Form.Item>
@@ -89,7 +115,7 @@ export default function Home() {
             loading={isLoading}
             disabled={isLoading}
           >
-            {isLoading ? "Signing In..." : "SIGN IN"}
+            {isLoading ? "Changing..." : "Submit"}
           </Button>
         </Form>
       </main>

@@ -3,7 +3,13 @@ import { cookies } from "next/headers";
 import jwt, { JwtPayload } from "jsonwebtoken";
 
 // 1. Specify protected and public routes
-const protectedRoutes = ["/evaluationForm", "/signaturePage", "/result"];
+const protectedRoutes = [
+  "/verifyOTP",
+  "/changePassword",
+  "/evaluationForm",
+  "/signature",
+  "/result",
+];
 const publicRoutes = ["/"];
 
 export default async function middleware(req: NextRequest) {
@@ -20,29 +26,23 @@ export default async function middleware(req: NextRequest) {
       return NextResponse.redirect(new URL("/", req.nextUrl));
     else return NextResponse.next();
   }
-  try {
-    const session = jwt.decode(token as string) as JwtPayload;
 
-    // 4. Redirect to /login if the user is not authenticated
-    if (isProtectedRoute && !session?.id) {
-      return NextResponse.redirect(new URL("/", req.nextUrl));
-    }
+  const session = jwt.decode(token as string) as JwtPayload;
 
-    // 5. Redirect to /dashboard if the user is authenticated
-    if (
-      isPublicRoute &&
-      session?.id &&
-      !req.nextUrl.pathname.startsWith("/evaluationForm")
-    ) {
-      return NextResponse.redirect(new URL("/evaluationForm", req.nextUrl));
-    }
-  } catch (e) {
-    console.log("unauthenticated", e);
+  // 4. Redirect to /login if the user is not authenticated
+  if (isProtectedRoute && !session?.id) {
     return NextResponse.redirect(new URL("/", req.nextUrl));
   }
+
+  // 5. Redirect to /dashboard if the user is authenticated
+  if ((isPublicRoute && session?.id) || path != session?.nextRouter) {
+    return NextResponse.redirect(new URL(session.nextRouter, req.nextUrl));
+  }
+
   if (path == "/result") {
     cookie.delete("session");
   }
+
   return NextResponse.next();
 }
 

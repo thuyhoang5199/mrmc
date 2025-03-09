@@ -210,7 +210,7 @@ export default function EvaluationForm() {
         setStartTime(new Date().toUTCString());
         if (res.data.successAll) {
           if (res.data?.isSignWhenComplete == "False") {
-            router.replace("signaturePage");
+            router.replace("/signature");
           } else {
             router.replace("/result");
           }
@@ -258,7 +258,7 @@ export default function EvaluationForm() {
       .post("/api/question", { ...values, startTime })
       .then((res) => {
         if (res.data?.successAll) {
-          router.replace("/signaturePage");
+          router.replace("/signature");
         } else {
           setQuestionInfo(res.data);
         }

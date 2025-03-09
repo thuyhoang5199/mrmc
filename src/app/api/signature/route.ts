@@ -1,13 +1,15 @@
 import fs from "fs";
 import { cookies } from "next/headers";
 import { NextRequest, NextResponse } from "next/server";
+import { returnWithNewToken } from "../auth/return-with-new-token";
 import { validateAuthenticated } from "../auth/validate-authenticated";
-import { getDriveClient, writeDataInRange } from "../utils/google/common";
+import { getDriveClient, writeDataInRange } from "../utils/google";
 export async function POST(req: NextRequest) {
   const cookie = (await cookies()).get("session")?.value;
   const { signature } = await req.json();
   const account = validateAuthenticated({
     token: cookie as string,
+    clientURL: ["/signature"],
   });
   if (account instanceof NextResponse) {
     return account;
@@ -51,10 +53,9 @@ export async function POST(req: NextRequest) {
     ],
   });
 
-  return NextResponse.json(
-    {
-      successAll: true,
-    },
-    { status: 200 }
-  );
+  return returnWithNewToken({
+    account,
+    nextRouter: "/result",
+    responseData: { successAll: true },
+  });
 }

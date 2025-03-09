@@ -2,35 +2,36 @@
 
 import React, { useState } from "react";
 import styles from "./page.module.css";
-import type { FormProps } from "antd";
-import { Button, Form, Input, Typography } from "antd";
+import { FormProps, Input, notification } from "antd";
+import { Button, Form, Typography } from "antd";
 import { useRouter } from "next/navigation";
-import { axiosInstance } from "./axios-instance";
+import { axiosInstance } from "../axios-instance";
 
 type FieldType = {
-  username?: string;
-  password?: string;
+  otp?: string;
 };
 
 export default function Home() {
   const router = useRouter();
   const [form] = Form.useForm();
   const [isLoading, setIsLoading] = useState(false);
+  const [api] = notification.useNotification();
 
   const onFinish: FormProps<FieldType>["onFinish"] = async (values) => {
     setIsLoading(true);
     await axiosInstance(router)
-      .post("/api/auth", {
-        username: values.username,
-        password: values.password,
+      .post("/api/auth/verify-otp", {
+        otp: values.otp,
       })
-      .then(() => {
-        router.replace("/verifyOTP");
+      .then((res) => {
+        if (res.data.isDefaultPassword == "True")
+          router.replace("/changePassword");
+        else router.replace("/evaluationForm");
       })
       .catch((error) => {
         form.setFields([
           {
-            name: "password",
+            name: "otp",
             errors: [error.message || "Something when wrong"],
           },
         ]);
@@ -46,11 +47,33 @@ export default function Home() {
     console.log("Failed:", errorInfo);
   };
 
+  const resendOTP = async () => {
+    setIsLoading(true);
+    await axiosInstance(router)
+      .post("/api/auth/resend-otp", {})
+      .then(() => {
+        api.success({
+          message: "Resend OTP Successful",
+        });
+      })
+      .catch((error) => {
+        form.setFields([
+          {
+            name: "otp",
+            errors: [error.message || "Something when wrong"],
+          },
+        ]);
+      })
+      .finally(() => {
+        setIsLoading(false);
+      });
+  };
+
   return (
     <div className={styles.page}>
       <main className={styles.main}>
         <Form
-          name="login"
+          name="verifyOTP"
           labelCol={{ span: 8 }}
           wrapperCol={{ span: 16 }}
           className={styles.form_login}
@@ -65,31 +88,40 @@ export default function Home() {
             the Multi-Reader Multi-Case (MRMC) Study
           </Typography.Title>
           <Form.Item<FieldType>
-            label="Username"
-            name="username"
-            rules={[{ required: true, message: "Please input your username!" }]}
+            label="OTP"
+            name="otp"
             labelAlign="left"
+            rules={[
+              { required: true, message: "Please input your otp!" },
+              {
+                pattern: /^\d{6}$/,
+                message: "OTP must contain exactly 6 digits!",
+              },
+            ]}
           >
             <Input />
-          </Form.Item>
-
-          <Form.Item<FieldType>
-            label="Password"
-            name="password"
-            rules={[{ required: true, message: "Please input your password!" }]}
-            labelAlign="left"
-          >
-            <Input.Password />
           </Form.Item>
 
           <Button
             htmlType="submit"
             className={styles.btn}
+            type="primary"
             block
             loading={isLoading}
             disabled={isLoading}
           >
-            {isLoading ? "Signing In..." : "SIGN IN"}
+            {isLoading ? "Verifying..." : "Verify"}
+          </Button>
+
+          <Button
+            onClick={resendOTP}
+            type="dashed"
+            block
+            loading={isLoading}
+            disabled={isLoading}
+            style={{ marginTop: 10 }}
+          >
+            {isLoading ? "Resending..." : "Resend"}
           </Button>
         </Form>
       </main>
