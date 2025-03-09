@@ -1,15 +1,22 @@
 .page {
-  /* background: linear-gradient(rgba(196, 234, 239, 0.95), rgba(248, 247, 248, 0.945)); */
-  background-color: rgba(249, 251, 251);
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
+  background-image: url("/bg-result.png");
+  background-size: contain; 
+  background-position: center; 
+  background-attachment: fixed; 
   height: 100vh;
 }
-
-.gif_style {
+.container {
+  background-color: rgba(0, 0, 0, 0.87);
+  text-align: center;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+.img_style {
   max-width: 500px !important;
+  margin-top: 200px;
 }
 
 .text_result {
@@ -17,7 +24,8 @@
 }
 
 .title {
-  font-size: 30px;
-  line-height: 50px;
-  color: #045e85;
+  font-size: 40px;
+  line-height: 60px;
+  color: #fff;
+font-weight: bold;
 }

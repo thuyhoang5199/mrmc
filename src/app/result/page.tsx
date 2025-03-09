@@ -7,23 +7,21 @@ import styles from "./page.module.css";
 export default function ResultPage() {
   return (
     <div className={styles.page}>
-      <Image
-        src="video.gif"
-        preview={false}
-        className={styles.gif_style}
-        alt="img"
-      />
-      <Result
-        status="success"
-        title={
-          <span className={styles.title}>
-            Congratulations! <br />
-            You have completed the MRMC Study successfully. <br />
-            Thank you for your support.
-          </span>
-        }
-        className={styles.text_result}
-      />
+      <div className={styles.container}>
+        <Image
+          src="/reverse-logo-white.svg"
+          preview={false}
+          className={styles.img_style}
+          alt="img"
+        />
+        <div className={styles.title}>
+          Congratulations! <br />
+          You have completed the MRMC Study successfully. <br />
+          Thank you for your support.
+        </div>
+
+      </div>
+
     </div>
   );
 }

@@ -142,7 +142,7 @@ export default function SignaturePage() {
                   className={styles.btn}
                   loading={isLoading}
                 >
-                  Completed
+                  Complete
                 </Button>
                 <Button
                   onClick={saveSignature}
