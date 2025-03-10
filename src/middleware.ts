@@ -34,6 +34,12 @@ export default async function middleware(req: NextRequest) {
     return NextResponse.redirect(new URL("/", req.nextUrl));
   }
 
+  // Handle case old cookie not has nextRouter
+  if (path === "undefined" || !session?.nextRouter) {
+    cookie.delete("session");
+    return NextResponse.redirect(new URL("/", req.nextUrl));
+  }
+
   // 5. Redirect to /dashboard if the user is authenticated
   if ((isPublicRoute && session?.id) || path != session?.nextRouter) {
     return NextResponse.redirect(new URL(session.nextRouter, req.nextUrl));
@@ -41,12 +47,6 @@ export default async function middleware(req: NextRequest) {
 
   if (path == "/result") {
     cookie.delete("session");
-  }
-
-  // Handle case old cookie not has nextRouter
-  if (path === "undefined" || !session?.nextRouter) {
-    cookie.delete("session");
-    return NextResponse.redirect(new URL("/", req.nextUrl));
   }
 
   return NextResponse.next();
