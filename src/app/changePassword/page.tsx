@@ -3,9 +3,10 @@
 import React, { useState } from "react";
 import styles from "./page.module.css";
 import type { FormProps } from "antd";
-import { Alert, Button, Form, Input, Typography } from "antd";
+import { Alert, Button, Form, Input, Space, Typography } from "antd";
 import { useRouter } from "next/navigation";
 import { axiosInstance } from "../axios-instance";
+import { logout } from "../functions/logout";
 
 type FieldType = {
   password?: string;
@@ -42,6 +43,11 @@ export default function Home() {
     errorInfo
   ) => {
     console.log("Failed:", errorInfo);
+  };
+
+
+  const submitLogout = () => {
+    logout(router);
   };
 
   return (
@@ -114,16 +120,22 @@ export default function Home() {
             <Input.Password />
           </Form.Item>
 
-          <Button
-            htmlType="submit"
-            className={styles.btn}
-            block
-            loading={isLoading}
-            disabled={isLoading}
-            style={{ marginTop: 10 }}
-          >
-            {isLoading ? "Changing..." : "Submit"}
-          </Button>
+
+          <Space style={{ marginTop: 10 }}>
+            <Button
+              htmlType="submit"
+              className={styles.btn}
+              block
+              loading={isLoading}
+              disabled={isLoading}
+              style={{ width: 175 }}
+            >
+              {isLoading ? "Changing..." : "Submit"}
+            </Button>
+            <Button style={{ width: 175 }} onClick={submitLogout}>
+              Back
+            </Button>
+          </Space>
         </Form>
       </main>
     </div>

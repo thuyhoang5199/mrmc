@@ -43,11 +43,19 @@ export default async function middleware(req: NextRequest) {
     cookie.delete("session");
   }
 
+  // Handle case old cookie not has nextRouter
+  if (!session?.nextRouter) {
+    cookie.delete("session");
+    return NextResponse.redirect(new URL("/", req.nextUrl));
+  }
+
   return NextResponse.next();
 }
 
 // Routes Middleware should not run on
 export const config = {
-  matcher: ["/((?!api|_next/static|_next/image|.*\\.png$).*)"],
+  matcher: [
+    "/((?!api|_next/static|_next/image|.*\\.png|.*\\.jpg|.*\\.ico$).*)",
+  ],
   unstable_allowDynamic: ["**/node_modules/**"],
 };
