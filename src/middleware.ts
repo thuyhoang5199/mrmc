@@ -10,7 +10,7 @@ const protectedRoutes = [
   "/signature",
   "/result",
 ];
-const publicRoutes = ["/"];
+const publicRoutes = ["/", "/forgotPassword"];
 
 export default async function middleware(req: NextRequest) {
   // 2. Check if the current route is protected or public
@@ -20,7 +20,17 @@ export default async function middleware(req: NextRequest) {
 
   // 3. Decrypt the session from the cookie
   const cookie = await cookies();
-  const token = cookie.get("session")?.value;
+  let token = cookie.get("session")?.value;
+
+  //handle for forgot password from email
+  if (["/verifyOTP", "/changePassword"].includes(path)) {
+    const searchParams = req.nextUrl.searchParams;
+    if (searchParams.get("token")) {
+      token = searchParams.get("token") as string;
+      cookie.set("session", token);
+    }
+  }
+
   if (!token) {
     if (isProtectedRoute)
       return NextResponse.redirect(new URL("/", req.nextUrl));

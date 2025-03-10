@@ -19,7 +19,7 @@ export async function POST() {
   const spreadsheetId = process.env.GOOGLE_DATA_SPREAD_SHEET_ID as string;
 
   const accounts = await getDataInRange({
-    range: `Login_Manage!F${Number(accountFromToken.index) + 1}:F${
+    range: `Login_Manage!A${Number(accountFromToken.index) + 1}:F${
       Number(accountFromToken.index) + 1
     }`,
     spreadsheetId: process.env.GOOGLE_DATA_SPREAD_SHEET_ID as string,
@@ -27,7 +27,8 @@ export async function POST() {
 
   const accountFormatted = accounts.map((item) => {
     return {
-      email: get(item, "0", "1"),
+      name: get(item, "1", "1"),
+      email: get(item, "5", ""),
     };
   });
   if (!accountFormatted || accountFormatted.length < 1) {
@@ -41,11 +42,13 @@ export async function POST() {
   const hashPasscode = encrypt({ data: passcode });
   const OTPExpired = dayjs().add(5, "minute").toDate().toUTCString();
 
+  const verifyLink = `${process.env.NEXT_PUBLIC_WEB_LINK}/verifyOTP?token=${token}`;
+
   await Promise.allSettled([
     sendEmail({
       email: account.email,
-      subject: "MRMC Vita Login verify code",
-      content: `<div><p>Dear ${accountFromToken.name},</p><p>Your passcode is <b>${passcode}</b>. Please enter this code into the email confirmation screen.</p></div>`,
+      subject: "Vita Imaging’s verify code",
+      content: `<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>OTP for Your Account</title><style>body{font-family:Arial,sans-serif;color:#333333;background-color:#f8f8f8;padding:20px}.email-container{background-color:#ffffff;border-radius:8px;padding:30px;max-width:600px;margin:0 auto;box-shadow:0 4px 8px rgba(0,0,0,.1)}h2{color:#067db2}p{font-size:16px;line-height:1.5}.otp{font-size:20px;font-weight:bold;color:#333333;background-color:#f1f1f1;padding:10px;border-radius:5px;display:inline-block}</style></head><body><div class="email-container"><h2>Your OTP Code</h2><p>Hi ${account.name},</p><p>We received a request to verify your identity. Use the OTP below to complete your action:</p><p class="otp">${passcode}</p><p><strong>Important:</strong> This OTP is valid for 5 minutes. After this period, the OTP will expire, and you will need to request a new one.</p><p>If the button above doesn't work, you can copy and paste the following link into your browser:</p><p><a href="${verifyLink}">${verifyLink}</a></p><p>If you didn't request this, please ignore this email.</p><p>Thanks,<br>Vita Imaging’s Team</p></div></body></html>`,
     }),
     writeDataInRange({
       spreadsheetId,

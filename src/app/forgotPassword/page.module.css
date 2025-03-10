@@ -1,0 +1,109 @@
+.page {
+  --gray-rgb: 0, 0, 0;
+  --gray-alpha-200: rgba(var(--gray-rgb), 0.08);
+  --gray-alpha-100: rgba(var(--gray-rgb), 0.05);
+
+  --button-primary-hover: #383838;
+  --button-secondary-hover: #f2f2f2;
+
+  display: grid;
+  grid-template-rows: 20px 1fr 20px;
+  align-items: center;
+  justify-items: center;
+  min-height: 100svh;
+  padding: 80px;
+  gap: 64px;
+  font-family: var(--font-geist-sans);
+  background: linear-gradient(
+      rgba(196, 234, 239, 0.95),
+      rgba(255, 255, 255, 0.98)
+    ),
+    url("/bg.png");
+  background-repeat: repeat-y;
+  background-position: center;
+}
+
+@media (prefers-color-scheme: dark) {
+  .page {
+    --gray-rgb: 255, 255, 255;
+    --gray-alpha-200: rgba(var(--gray-rgb), 0.145);
+    --gray-alpha-100: rgba(var(--gray-rgb), 0.06);
+
+    --button-primary-hover: #ccc;
+    --button-secondary-hover: #1a1a1a;
+  }
+}
+
+.main {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 32px;
+  grid-row-start: 2;
+}
+.btn {
+  background-color: #13bed8 !important;
+  color: #fff !important;
+}
+.btn:hover {
+  background-color: #067db2 !important;
+  color: #fff !important;
+}
+
+.form_login {
+  width: 550px; /* Điều chỉnh chiều rộng theo ý muốn */
+  text-align: center;
+  padding: 90px 20px 30px 20px !important;
+  border: 2px solid transparent; /* Đường viền màu xám nhạt */
+  border-radius: 10px; /* Bo tròn góc */
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Tạo bóng đổ nhẹ */
+  position: relative; /* Cần thiết cho phần tử hình tròn */
+  border-image: linear-gradient(to right, #13bed8, #067db2) 1;
+  background-color: #fff;
+}
+
+.form_login::before {
+  content: "";
+  position: absolute;
+  top: -70px; /* Điều chỉnh vị trí hình tròn */
+  left: 50%;
+  transform: translateX(-50%);
+  width: 120px; /* Kích thước hình tròn */
+  height: 120px;
+  background-color: #fff; /* Màu nền hình tròn */
+  border-radius: 50%; /* Tạo hình tròn */
+}
+
+.form_login::after {
+  content: ""; /* Số 8 trong hình tròn */
+  position: absolute;
+  top: -100px; /* Điều chỉnh vị trí số 8 */
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 20px;
+  font-weight: bold;
+  width: 180px; /* Điều chỉnh kích thước cho phù hợp với hình ảnh */
+  height: 180px;
+  background-image: url("/logoVita.png");
+  background-size: cover;
+}
+.title {
+  margin-bottom: 30px !important;
+  color: #063e5c !important ;
+}
+@media (max-width: 600px) {
+  .page {
+    padding: 32px;
+    padding-bottom: 80px;
+  }
+
+  .main {
+    align-items: center;
+  }
+}
+
+@media (prefers-color-scheme: dark) {
+  .logo {
+    filter: invert();
+  }
+}

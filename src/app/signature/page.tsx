@@ -13,7 +13,7 @@ export default function SignaturePage() {
   const sigCanvas = useRef<SignatureCanvas>(null);
   const [isSigned, setIsSigned] = useState(false);
   const today = new Date();
-  const [api] = notification.useNotification();
+  const [api, contextHolderNotificationSave] = notification.useNotification();
   const [isLoading, setIsLoading] = useState(false);
 
   const day = String(today.getDate()).padStart(2, "0");
@@ -73,6 +73,7 @@ export default function SignaturePage() {
   return (
     <div className={styles.page}>
       <div className={styles.container}>
+        {contextHolderNotificationSave}
         <Image
           alt="background"
           src="bg.png"

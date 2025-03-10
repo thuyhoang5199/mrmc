@@ -16,7 +16,7 @@ export default function OTPPage() {
   const router = useRouter();
   const [form] = Form.useForm();
   const [isLoading, setIsLoading] = useState(false);
-  const [api] = notification.useNotification();
+  const [api, contextHolderNotificationSave] = notification.useNotification();
   const [email, setEmail] = useState("");
 
   useEffect(() => {
@@ -87,6 +87,7 @@ export default function OTPPage() {
   return (
     <div className={styles.page}>
       <main className={styles.main}>
+        {contextHolderNotificationSave}
         <Form
           name="verifyOTP"
           wrapperCol={{ span: 24 }}
