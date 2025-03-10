@@ -1,12 +1,8 @@
 import { NextResponse } from "next/server";
-import { getDataInRange, writeDataInRange } from "../../utils/google";
+import { getDataInRange } from "../../utils/google";
 import { get } from "lodash";
 import { sendEmail } from "../../utils/mail";
-import { encrypt } from "../../utils/cipher";
-import dayjs from "dayjs";
-import { returnWithNewToken } from "../return-with-new-token";
 import jwt from "jsonwebtoken";
-import { serialize } from "cookie";
 
 export async function POST(req: Request) {
   const { username } = await req.json();
