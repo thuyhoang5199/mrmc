@@ -17,12 +17,15 @@ export default function OTPPage() {
   const [form] = Form.useForm();
   const [isLoading, setIsLoading] = useState(false);
   const [api] = notification.useNotification();
-  const [email, setEmail] = useState('');
+  const [email, setEmail] = useState("");
 
   useEffect(() => {
-    axiosInstance(router).get('/api/cookie').then(res => {
-      setEmail(res.data.email)
-    })
+    axiosInstance(router)
+      .get("/api/cookie")
+      .then((res) => {
+        setEmail(res.data.email);
+      });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const onFinish: FormProps<FieldType>["onFinish"] = async (values) => {
@@ -77,11 +80,9 @@ export default function OTPPage() {
       });
   };
 
-
   const submitLogout = () => {
     logout(router);
   };
-
 
   return (
     <div className={styles.page}>
@@ -95,19 +96,21 @@ export default function OTPPage() {
           onFinishFailed={onFinishFailed}
           autoComplete="off"
           form={form}
-
         >
           <Typography.Title level={4} className={styles.title}>
             Welcome to Vita Imaging’s <br />
             MRMC (Multi-Reader Multi-Case) Study
           </Typography.Title>
-          <Typography.Title level={4} style={{ textAlign: 'left' }}>
+          <Typography.Title level={4} style={{ textAlign: "left" }}>
             Verify your identity
           </Typography.Title>
-          <p style={{ textAlign: 'left' }}>You are required to change the default password. Please enter OTP code we sent you at {email} </p>
+          <p style={{ textAlign: "left" }}>
+            You are required to change the default password. Please enter OTP
+            code we sent you at {email}{" "}
+          </p>
 
-          <Typography style={{ textAlign: 'left', marginBottom: 10 }} >
-            Didn't receive the code? {" "}
+          <Typography style={{ textAlign: "left", marginBottom: 10 }}>
+            Didn&apos;t receive the code?{" "}
             <Button
               onClick={resendOTP}
               type="link"
@@ -144,14 +147,16 @@ export default function OTPPage() {
             >
               {isLoading ? "Verifying..." : "Verify"}
             </Button>
-            <Button
-              style={{ width: 175 }}
-              onClick={submitLogout}
-            >Back</Button>
+            <Button style={{ width: 175 }} onClick={submitLogout}>
+              Back
+            </Button>
           </Space>
 
-
-          <p style={{ marginTop: 20 }}>If you can&apos;t find the verification code, please retry sign in or contact our <a href="mailto:Info@vita-imaging.com">Support center</a></p>
+          <p style={{ marginTop: 20 }}>
+            If you can&apos;t find the verification code, please retry sign in
+            or contact our{" "}
+            <a href="mailto:Info@vita-imaging.com">Support center</a>
+          </p>
         </Form>
       </main>
     </div>
