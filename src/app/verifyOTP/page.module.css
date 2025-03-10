@@ -51,7 +51,7 @@
 }
 
 .form_login {
-  max-width: 600px; /* Điều chỉnh chiều rộng theo ý muốn */
+  max-width: 405px; /* Điều chỉnh chiều rộng theo ý muốn */
   text-align: center;
   padding: 90px 20px 30px 20px !important;
   border: 2px solid transparent; /* Đường viền màu xám nhạt */
@@ -90,6 +90,13 @@
 .title {
   margin-bottom: 30px !important;
   color: #063e5c !important ;
+}
+.btn_link{
+  padding: unset !important;
+}
+.label_otp {
+  font-size: 18px;
+  font-weight: 600;
 }
 @media (max-width: 600px) {
   .page {

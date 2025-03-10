@@ -104,20 +104,23 @@ export default function OTPPage() {
           <Typography.Title level={4} style={{ textAlign: 'left' }}>
             Verify your identity
           </Typography.Title>
-          <p style={{ textAlign: 'left' }}>Please enter the verification code we sent you at </p>
-          <Typography.Title level={5} style={{ textAlign: 'left' }} >
-            {email}
+          <p style={{ textAlign: 'left' }}>You are required to change the default password. Please enter OTP code we sent you at {email} </p>
+
+          <Typography style={{ textAlign: 'left', marginBottom: 10 }} >
+            Didn't receive the code? {" "}
             <Button
               onClick={resendOTP}
               type="link"
               loading={isLoading}
               disabled={isLoading}
+              className={styles.btn_link}
             >
               {isLoading ? "Resending..." : "Resend"}
-            </Button></Typography.Title>
+            </Button>
+          </Typography>
+          <label className={styles.label_otp}>Enter OTP</label>
           <Form.Item<FieldType>
             name="otp"
-            labelAlign="left"
             rules={[
               { required: true, message: "Please input your otp!" },
               {
@@ -125,10 +128,11 @@ export default function OTPPage() {
                 message: "OTP must contain exactly 6 digits!",
               },
             ]}
+            style={{ marginTop: 10 }}
           >
             <Input.OTP length={6} size="large" />
           </Form.Item>
-          <Space style={{ marginTop: 15 }}>
+          <Space style={{ marginTop: 10 }}>
             <Button
               htmlType="submit"
               className={styles.btn}
@@ -136,14 +140,14 @@ export default function OTPPage() {
               block
               loading={isLoading}
               disabled={isLoading}
-              style={{ width: 120 }}
+              style={{ width: 175 }}
             >
               {isLoading ? "Verifying..." : "Verify"}
             </Button>
             <Button
-              style={{ width: 120 }}
+              style={{ width: 175 }}
               onClick={submitLogout}
-            >Cancel</Button>
+            >Back</Button>
           </Space>
 
 
