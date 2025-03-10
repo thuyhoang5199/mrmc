@@ -419,7 +419,7 @@ export default function EvaluationForm() {
                 alt=""
                 src={
                   questionInfo.lesionAuraResultScreen
-                    ? `https://mrmc.vercel.app/${questionInfo.lesionAuraResultScreen}.jpg`
+                    ? `${questionInfo.lesionAuraResultScreen}.jpg`
                     : undefined
                 }
                 className={styles.img}
@@ -442,7 +442,7 @@ export default function EvaluationForm() {
                 alt=""
                 src={
                   questionInfo.lesionPicture
-                    ? `https://mrmc.vercel.app/${questionInfo.lesionPicture}.jpg`
+                    ? `${questionInfo.lesionPicture}.jpg`
                     : undefined
                 }
                 className={styles.img}
