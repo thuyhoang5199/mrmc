@@ -44,7 +44,7 @@ export default async function middleware(req: NextRequest) {
   }
 
   // Handle case old cookie not has nextRouter
-  if (!session?.nextRouter) {
+  if (path === "undefined" || !session?.nextRouter) {
     cookie.delete("session");
     return NextResponse.redirect(new URL("/", req.nextUrl));
   }

@@ -412,16 +412,12 @@ export default function EvaluationForm() {
           {contextHolderNotificationSave}
 
           <Typography className={styles.img_gr}>
-            {isLoading ? (
+            {isLoading || !questionInfo.lesionAuraResultScreen ? (
               <Skeleton.Image active={true} />
             ) : currentData.eval === 2 ? (
               <Image
                 alt=""
-                src={
-                  questionInfo.lesionAuraResultScreen
-                    ? `https://mrmc.vercel.app/${questionInfo.lesionAuraResultScreen}.jpg`
-                    : undefined
-                }
+                src={`https://mrmc.vercel.app/${questionInfo.lesionAuraResultScreen}.jpg`}
                 className={styles.img}
                 preview={false}
               />
@@ -435,16 +431,12 @@ export default function EvaluationForm() {
                 </span>
               </div>
             )}
-            {isLoading ? (
+            {isLoading || !questionInfo.lesionPicture ? (
               <Skeleton.Image active={true} />
             ) : (
               <Image
                 alt=""
-                src={
-                  questionInfo.lesionPicture
-                    ? `https://mrmc.vercel.app/${questionInfo.lesionPicture}.jpg`
-                    : undefined
-                }
+                src={`https://mrmc.vercel.app/${questionInfo.lesionPicture}.jpg`}
                 className={styles.img}
                 preview={false}
               />
