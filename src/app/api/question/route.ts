@@ -1,4 +1,4 @@
-import { get } from "lodash";
+import { get, set } from "lodash";
 import { NextRequest, NextResponse } from "next/server";
 import { validateAuthenticated } from "../auth/validate-authenticated";
 import { getDataInRange, writeDataInRange } from "../utils/google";
@@ -30,7 +30,7 @@ export async function GET() {
       isSignWhenComplete: get(item, "5", "False"),
     };
   });
-  const currentAnswer = answersOverviewFormatted.find(
+  const currentAnswerOverview = answersOverviewFormatted.find(
     (item) => item.accountId == account.id
   );
   let nextQuestionIndex: number;
@@ -38,7 +38,7 @@ export async function GET() {
 
   const LESION_LENGTH = Number(process.env.LESION_LENGTH);
 
-  if (!currentAnswer) {
+  if (!currentAnswerOverview) {
     let index = 1;
     let listLesion: number[] = [];
     while (index <= LESION_LENGTH) {
@@ -67,20 +67,20 @@ export async function GET() {
       ],
     });
   } else {
-    nextQuestionIndex = Number(currentAnswer.currentLesion);
+    nextQuestionIndex = Number(currentAnswerOverview.currentLesion);
     nextQuestionIndexInListQuestion =
-      currentAnswer.listLesion
+      currentAnswerOverview.listLesion
         .split("|")
         .indexOf(nextQuestionIndex.toString()) + 1;
     if (nextQuestionIndex == -1) {
       return returnWithNewToken({
         account,
         nextRouter:
-          currentAnswer.isSignWhenComplete == "False"
+          currentAnswerOverview.isSignWhenComplete == "False"
             ? "/signature"
             : "/result",
         responseData: {
-          isSignWhenComplete: currentAnswer.isSignWhenComplete,
+          isSignWhenComplete: currentAnswerOverview.isSignWhenComplete,
           successAll: true,
         },
       });
@@ -92,6 +92,27 @@ export async function GET() {
     spreadsheetId: process.env.GOOGLE_DATA_SPREAD_SHEET_ID as string,
   });
 
+  const answerLesions = await getDataInRange({
+    range: `Answer_Lesion_${nextQuestionIndex}!B${accountIndex + 2}:K${
+      accountIndex + 2
+    }`,
+    spreadsheetId: process.env.GOOGLE_DATA_SPREAD_SHEET_ID as string,
+  });
+  const answerLesion = answerLesions.map((i) => {
+    const data = {};
+    set(data, "eval1.type", get(i, "0", ""));
+    set(data, `eval1.${get(i, "0", "")}ConfidenceLevel`, get(i, "1", ""));
+    set(data, `eval1.${get(i, "0", "")}LesionType`, get(i, "2", ""));
+    set(data, `eval1.done`, get(i, "3", ""));
+    set(data, "eval2.type", get(i, "4", ""));
+    set(data, `eval2.${get(i, "4", "")}ConfidenceLevel`, get(i, "5", ""));
+    set(data, `eval2.${get(i, "4", "")}LesionType`, get(i, "6", ""));
+    set(data, `eval2.affectDiagnostic`, get(i, "7", ""));
+    set(data, `eval2.affectConfidenceLevel`, get(i, "8", ""));
+    set(data, `eval2.done`, get(i, "9", ""));
+    return data;
+  })?.[0];
+
   const question = questions.map((item) => {
     return {
       lesionId: get(item, "1", ""),
@@ -101,6 +122,7 @@ export async function GET() {
       lesionSize: get(item, "5", ""),
       lesionPicture: get(item, "6", ""),
       lesionAuraResultScreen: get(item, "7", ""),
+      answerLesion: answerLesion || {},
     };
   });
   return NextResponse.json(
@@ -154,7 +176,7 @@ export async function POST(req: NextRequest) {
     );
   } else {
     const listLesion = currentAnswerOverview.listLesion.split("|");
-    const nextQuestionIndex =
+    let nextQuestionIndex =
       listLesion[
         listLesion.findIndex(
           (item) => item == currentAnswerOverview.currentLesion.toString()
@@ -183,42 +205,60 @@ export async function POST(req: NextRequest) {
     ${diffHrs != 0 ? diffHrs + " hours " : ""}
     ${diffMins != 0 ? diffMins + " minutes " : ""}
     ${diffSecond != 0 ? diffSecond + " seconds " : ""}`;
+    const dataWriteToRange = [];
+    if (eval2?.done == "True") {
+      dataWriteToRange.push({
+        values: [
+          [
+            nextQuestionIndex || "-1",
+            percent,
+            nextQuestionIndex ? "" : new Date().toUTCString(),
+          ],
+        ],
+        range: `Answer_Overview!C${accountIndex + 1}:E${accountIndex + 1}`,
+      });
+    } else {
+      nextQuestionIndex =
+        listLesion[
+          listLesion.findIndex(
+            (item) => item == currentAnswerOverview.currentLesion.toString()
+          )
+        ];
+    }
 
+    const dataAnswerToWriteAnswer: Array<string> = [];
+    if (eval1) {
+      dataAnswerToWriteAnswer.push(
+        account.id,
+        eval1.type,
+        eval1[`${eval1.type}ConfidenceLevel`],
+        eval1[`${eval1.type}LesionType`],
+        eval1.done
+      );
+    }
+    if (eval2) {
+      dataAnswerToWriteAnswer.push(
+        eval2.type,
+        eval2[`${eval2.type}ConfidenceLevel`],
+        eval2[`${eval2.type}LesionType`],
+        eval2.affectDiagnostic,
+        eval2.affectConfidenceLevel,
+        eval2.done,
+        startTime,
+        endTime.toUTCString(),
+        diffTime
+      );
+    }
+
+    dataWriteToRange.push({
+      range: `Answer_Lesion_${currentAnswerOverview.currentLesion}!${
+        eval1 ? "A" : "F"
+      }${accountIndex + 2}:${eval2 ? "N" : "E"}${accountIndex + 2}`,
+      values: [dataAnswerToWriteAnswer],
+    });
     await writeDataInRange({
       spreadsheetId: process.env.GOOGLE_DATA_SPREAD_SHEET_ID as string,
-      data: [
-        {
-          values: [
-            [
-              nextQuestionIndex || "-1",
-              percent,
-              nextQuestionIndex ? "" : new Date().toUTCString(),
-            ],
-          ],
-          range: `Answer_Overview!C${accountIndex + 1}:E${accountIndex + 1}`,
-        },
-        {
-          range: `Answer_Lesion_${currentAnswerOverview.currentLesion}!A${
-            accountIndex + 2
-          }:L${accountIndex + 2}`,
-          values: [
-            [
-              account.id,
-              eval1.type,
-              eval1[`${eval1.type}ConfidenceLevel`],
-              eval1[`${eval1.type}LesionType`],
-              eval2.type,
-              eval2[`${eval2.type}ConfidenceLevel`],
-              eval2[`${eval2.type}LesionType`],
-              eval2.affectDiagnostic,
-              eval2.affectConfidenceLevel,
-              startTime,
-              endTime.toUTCString(),
-              diffTime,
-            ],
-          ],
-        },
-      ],
+      data: dataWriteToRange,
     });
 
     //done all lesion
