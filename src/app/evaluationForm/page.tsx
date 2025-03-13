@@ -329,7 +329,7 @@ export default function EvaluationForm() {
 
     const interval = setInterval(() => {
       // Kiểm tra nếu 5 phút đã trôi qua và API chưa được gọi
-      if (Date.now() - lastActionTime > 1 * 60 * 1000 && !isApiCalled) {
+      if (Date.now() - lastActionTime > 5 * 60 * 1000 && !isApiCalled) {
         setIsApiCalled(true);
         const data = form.getFieldsValue();
         if (currentEval == 1) {
