@@ -195,6 +195,10 @@ export default function EvaluationForm() {
           setQuestionInfo(omit(res.data, ["answerLesion"]) as any);
           setCurrentEval(Number(res.data?.answerLesion?.currentEval || 1));
           form.setFieldsValue(omit(res.data?.answerLesion, ["currentEval"]));
+          if (res.data?.startTime) {
+            setSeconds(Date.now() - res.data?.startTime);
+            console.log("voday");
+          } else { setSeconds(0); }
         }
       })
       .catch(async (e) => {
@@ -205,7 +209,6 @@ export default function EvaluationForm() {
       })
       .finally(() => {
         setIsLoading(false);
-        setSeconds(0);
       });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -221,6 +224,7 @@ export default function EvaluationForm() {
         eval2: { ...values, done: "True" },
         resetForm: true,
       });
+      setSeconds(0);
     }
   };
 
@@ -248,7 +252,6 @@ export default function EvaluationForm() {
       .finally(() => {
         setStartTime(new Date().toUTCString());
         setIsLoading(false);
-        setSeconds(0);
       });
   };
 
