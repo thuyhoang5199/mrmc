@@ -4,6 +4,15 @@ import { validateAuthenticated } from "../auth/validate-authenticated";
 import { getDataInRange, writeDataInRange } from "../utils/google";
 import { cookies } from "next/headers";
 import { returnWithNewToken } from "../auth/return-with-new-token";
+import dayjs from "dayjs";
+import timezone from "dayjs/plugin/timezone";
+import utc from "dayjs/plugin/utc";
+import { DATE_STRING_FORMAT, TZ } from "../constants";
+import customParseFormat from "dayjs/plugin/customParseFormat";
+
+dayjs.extend(utc);
+dayjs.extend(timezone);
+dayjs.extend(customParseFormat);
 
 export async function GET() {
   const cookie = (await cookies()).get("session")?.value;
@@ -64,6 +73,12 @@ export async function GET() {
             ],
           ],
         },
+        {
+          range: `Answer_Lesion_${nextQuestionIndex}!A${accountIndex + 2}:B${
+            accountIndex + 2
+          }`,
+          values: [[account.id, dayjs().tz(TZ).format(DATE_STRING_FORMAT)]],
+        },
       ],
     });
   } else {
@@ -93,28 +108,48 @@ export async function GET() {
   });
 
   const answerLesions = await getDataInRange({
-    range: `Answer_Lesion_${nextQuestionIndex}!B${accountIndex + 2}:K${
+    range: `Answer_Lesion_${nextQuestionIndex}!A${accountIndex + 2}:M${
       accountIndex + 2
     }`,
     spreadsheetId: process.env.GOOGLE_DATA_SPREAD_SHEET_ID as string,
   });
+
+  if (get(answerLesions, "[0][1]", "") == "") {
+    await writeDataInRange({
+      spreadsheetId: process.env.GOOGLE_DATA_SPREAD_SHEET_ID as string,
+      data: [
+        {
+          range: `Answer_Lesion_${nextQuestionIndex}!A${accountIndex + 2}:B${
+            accountIndex + 2
+          }`,
+          values: [[account.id, dayjs().tz(TZ).format(DATE_STRING_FORMAT)]],
+        },
+      ],
+    });
+  }
+
   const answerLesion = answerLesions.map((i) => {
     const data = {};
     //lesion 1 done
-    if ((get(i, "3", "") as string) == "True") {
-      set(data, "type", get(i, "4", ""));
-      set(data, `${get(i, "4", "")}ConfidenceLevel`, get(i, "5", ""));
-      set(data, `${get(i, "4", "")}LesionType`, get(i, "6", ""));
-      set(data, `affectDiagnostic`, get(i, "7", ""));
-      set(data, `affectConfidenceLevel`, get(i, "8", ""));
+    if ((get(i, "5", "") as string) == "True") {
+      set(data, "type", get(i, "7", ""));
+      set(data, `${get(i, "7", "")}ConfidenceLevel`, get(i, "8", ""));
+      set(data, `${get(i, "7", "")}LesionType`, get(i, "9", ""));
+      set(data, `affectDiagnostic`, get(i, "10", ""));
+      set(data, `affectConfidenceLevel`, get(i, "11", ""));
       set(data, "currentEval", 2);
     } else {
-      set(data, "type", get(i, "0", ""));
-      set(data, `${get(i, "0", "")}ConfidenceLevel`, get(i, "1", ""));
-      set(data, `${get(i, "0", "")}LesionType`, get(i, "2", ""));
-      set(data, `done`, get(i, "3", ""));
+      set(data, "type", get(i, "2", ""));
+      set(data, `${get(i, "2", "")}ConfidenceLevel`, get(i, "3", ""));
+      set(data, `${get(i, "2", "")}LesionType`, get(i, "4", ""));
+      set(data, `done`, get(i, "5", ""));
       set(data, "currentEval", 1);
     }
+    set(
+      data,
+      "startTime",
+      dayjs.tz(get(i, "1", ""), DATE_STRING_FORMAT, TZ).toDate()
+    );
 
     return data;
   })?.[0];
@@ -144,7 +179,7 @@ export async function GET() {
 
 export async function POST(req: NextRequest) {
   const cookie = (await cookies()).get("session")?.value;
-  const { eval1, eval2, startTime } = await req.json();
+  const { eval1, eval2 } = await req.json();
   const account = validateAuthenticated({
     token: cookie as string,
     clientURL: ["/evaluationForm"],
@@ -197,20 +232,20 @@ export async function POST(req: NextRequest) {
       100
     ).toFixed(2);
 
-    const endTime = new Date();
-    const startTimeParse = new Date(startTime);
+    // const endTime = new Date();
+    // const startTimeParse = new Date(startTime);
 
-    const diffMs = endTime.getTime() - startTimeParse.getTime(); // milliseconds between now & Christmas
-    const diffDays = Math.floor(diffMs / 86400000); // days
-    const diffHrs = Math.floor((diffMs % 86400000) / 3600000); // hours
-    const diffMins = Math.round(((diffMs % 86400000) % 3600000) / 60000); // minutes
-    const diffSecond = Math.round(
-      (((diffMs % 86400000) % 3600000) % 60000) / 1000
-    ); // minutes
-    const diffTime = `${diffDays != 0 ? diffDays + " days " : ""}
-    ${diffHrs != 0 ? diffHrs + " hours " : ""}
-    ${diffMins != 0 ? diffMins + " minutes " : ""}
-    ${diffSecond != 0 ? diffSecond + " seconds " : ""}`;
+    // const diffMs = endTime.getTime() - startTimeParse.getTime(); // milliseconds between now & Christmas
+    // const diffDays = Math.floor(diffMs / 86400000); // days
+    // const diffHrs = Math.floor((diffMs % 86400000) / 3600000); // hours
+    // const diffMins = Math.round(((diffMs % 86400000) % 3600000) / 60000); // minutes
+    // const diffSecond = Math.round(
+    //   (((diffMs % 86400000) % 3600000) % 60000) / 1000
+    // ); // minutes
+    // const diffTime = `${diffDays != 0 ? diffDays + " days " : ""}
+    // ${diffHrs != 0 ? diffHrs + " hours " : ""}
+    // ${diffMins != 0 ? diffMins + " minutes " : ""}
+    // ${diffSecond != 0 ? diffSecond + " seconds " : ""}`;
     const dataWriteToRange = [];
     if (eval2?.done == "True") {
       dataWriteToRange.push({
@@ -218,11 +253,19 @@ export async function POST(req: NextRequest) {
           [
             nextQuestionIndex || "-1",
             percent,
-            nextQuestionIndex ? "" : new Date().toUTCString(),
+            nextQuestionIndex ? "" : dayjs().tz(TZ).format(DATE_STRING_FORMAT),
           ],
         ],
         range: `Answer_Overview!C${accountIndex + 1}:E${accountIndex + 1}`,
       });
+      if (nextQuestionIndex) {
+        dataWriteToRange.push({
+          range: `Answer_Lesion_${nextQuestionIndex}!A${accountIndex + 2}:C${
+            accountIndex + 2
+          }`,
+          values: [[account.id, dayjs().tz(TZ).format(DATE_STRING_FORMAT)]],
+        });
+      }
     } else {
       nextQuestionIndex =
         listLesion[
@@ -235,11 +278,11 @@ export async function POST(req: NextRequest) {
     const dataAnswerToWriteAnswer: Array<string> = [];
     if (eval1) {
       dataAnswerToWriteAnswer.push(
-        account.id,
         eval1.type,
         eval1[`${eval1.type}ConfidenceLevel`],
         eval1[`${eval1.type}LesionType`],
-        eval1.done
+        eval1.done,
+        dayjs().tz(TZ).format(DATE_STRING_FORMAT)
       );
     }
     if (eval2) {
@@ -250,16 +293,14 @@ export async function POST(req: NextRequest) {
         eval2.affectDiagnostic,
         eval2.affectConfidenceLevel,
         eval2.done,
-        startTime,
-        endTime.toUTCString(),
-        diffTime
+        dayjs().tz(TZ).format(DATE_STRING_FORMAT)
       );
     }
 
     dataWriteToRange.push({
       range: `Answer_Lesion_${currentAnswerOverview.currentLesion}!${
-        eval1 ? "A" : "F"
-      }${accountIndex + 2}:${eval2 ? "N" : "E"}${accountIndex + 2}`,
+        eval1 ? "C" : "H"
+      }${accountIndex + 2}:${eval1 ? "G" : "N"}${accountIndex + 2}`,
       values: [dataAnswerToWriteAnswer],
     });
     await writeDataInRange({

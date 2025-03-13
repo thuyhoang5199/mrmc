@@ -26,17 +26,18 @@ import LoadingPage from "../component/LoadingPage";
 import { axiosInstance } from "../axios-instance";
 import { logout } from "../functions/logout";
 import { omit } from "lodash";
+import dayjs from "dayjs";
 
 const marksBenign: SliderSingleProps["marks"] = {
   1: {
     style: {
-      color: "#086f0f",
+      color: "#9c9006",
       width: "100px",
       left: "-60px",
       top: "-50px",
       fontSize: "18px",
     },
-    label: <strong>High confidence Benign</strong>,
+    label: <strong>Low confidence Benign</strong>,
   },
   10: "10",
   20: "20",
@@ -49,13 +50,13 @@ const marksBenign: SliderSingleProps["marks"] = {
   90: "90",
   100: {
     style: {
-      color: "#9c9006",
+      color: "red",
       width: "100px",
       top: "-50px",
       transform: "translateX(4%)",
       fontSize: "18px",
     },
-    label: <strong>Low confidence Benign</strong>,
+    label: <strong>High confidence Benign</strong>,
   },
 };
 const marksMalignant: SliderSingleProps["marks"] = {
@@ -195,10 +196,13 @@ export default function EvaluationForm() {
           setQuestionInfo(omit(res.data, ["answerLesion"]) as any);
           setCurrentEval(Number(res.data?.answerLesion?.currentEval || 1));
           form.setFieldsValue(omit(res.data?.answerLesion, ["currentEval"]));
-          if (res.data?.startTime) {
-            setSeconds(Date.now() - res.data?.startTime);
-            console.log("voday");
-          } else { setSeconds(0); }
+          if (res.data?.answerLesion?.startTime) {
+            setSeconds(
+              Math.ceil(dayjs().diff(res.data?.answerLesion?.startTime) / 1000)
+            );
+          } else {
+            setSeconds(0);
+          }
         }
       })
       .catch(async (e) => {

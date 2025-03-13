@@ -1,17 +1,25 @@
 "use client"; // Explicitly mark this file as a Client Component
 
-import { Button, Form, Space, Typography, Image, notification } from "antd";
+import {
+  Button,
+  Form,
+  Space,
+  Typography,
+  Image,
+  notification,
+  Input,
+} from "antd";
 import { useRouter } from "next/navigation";
-import React, { useRef, useState } from "react";
+import React, { useState } from "react";
 import styles from "./page.module.css";
-import SignatureCanvas from "react-signature-canvas";
+// import SignatureCanvas from "react-signature-canvas";
 import { axiosInstance } from "../axios-instance";
 import LoadingPage from "../component/LoadingPage";
 
 export default function SignaturePage() {
   const router = useRouter();
-  const sigCanvas = useRef<SignatureCanvas>(null);
-  const [isSigned, setIsSigned] = useState(false);
+  // const sigCanvas = useRef<SignatureCanvas>(null);
+  // const [isSigned, setIsSigned] = useState(false);
   const today = new Date();
   const [api, contextHolderNotificationSave] = notification.useNotification();
   const [isLoading, setIsLoading] = useState(false);
@@ -22,52 +30,74 @@ export default function SignaturePage() {
 
   const formattedDate = `${month}/${day}/${year}`;
 
-  const clearSignature = () => {
-    if (sigCanvas.current) {
-      sigCanvas.current.clear();
-      setIsSigned(false); // Đặt lại trạng thái sau khi xóa chữ ký
-    }
-  };
+  // const clearSignature = () => {
+  //   if (sigCanvas.current) {
+  //     sigCanvas.current.clear();
+  //     setIsSigned(false); // Đặt lại trạng thái sau khi xóa chữ ký
+  //   }
+  // };
 
-  const saveSignature = () => {
-    if (sigCanvas.current) {
-      const dataURL = sigCanvas.current.toDataURL(); // Lấy dữ liệu chữ ký dưới dạng ảnh
-      // Bạn có thể lưu dataURL vào máy chủ hoặc hiển thị nó cho người dùng
-      axiosInstance(router)
-        .post("/api/signature", {
-          signature: dataURL.replace(/^data:image\/png;base64,/, ""),
-        })
-        .then((res) => {
-          if (res.data?.successAll) {
-            router.replace("/result");
-          }
-        })
-        .catch(async (e) => {
-          api.error({
-            message: "Save error",
-            description: e.message,
-          });
-        })
-        .finally(() => {
-          setIsLoading(false);
+  // const saveSignature = (values: any) => {
+  //   if (sigCanvas.current) {
+  //     const dataURL = sigCanvas.current.toDataURL(); // Lấy dữ liệu chữ ký dưới dạng ảnh
+  //     // Bạn có thể lưu dataURL vào máy chủ hoặc hiển thị nó cho người dùng
+  //     axiosInstance(router)
+  //       .post("/api/signature", {
+  //         signature: dataURL.replace(/^data:image\/png;base64,/, ""),
+  //       })
+  //       .then((res) => {
+  //         if (res.data?.successAll) {
+  //           router.replace("/result");
+  //         }
+  //       })
+  //       .catch(async (e) => {
+  //         api.error({
+  //           message: "Save error",
+  //           description: e.message,
+  //         });
+  //       })
+  //       .finally(() => {
+  //         setIsLoading(false);
+  //       });
+  //   } else {
+  //     api.error({
+  //       message: "Save error",
+  //       description: "Signature empty",
+  //     });
+  //   }
+  // };
+
+  // const handleEnd = () => {
+  //   if (sigCanvas.current) {
+  //     // Kiểm tra nếu canvas có chữ ký
+  //     if (!sigCanvas.current.isEmpty()) {
+  //       setIsSigned(true);
+  //     } else {
+  //       setIsSigned(false);
+  //     }
+  //   }
+  // };
+
+  const saveSignature = (values: any) => {
+    setIsLoading(true);
+    axiosInstance(router)
+      .post("/api/signature", {
+        signature: values.signature,
+      })
+      .then((res) => {
+        if (res.data?.successAll) {
+          router.replace("/result");
+        }
+      })
+      .catch(async (e) => {
+        api.error({
+          message: "Save error",
+          description: e.message,
         });
-    } else {
-      api.error({
-        message: "Save error",
-        description: "Signature empty",
+      })
+      .finally(() => {
+        setIsLoading(false);
       });
-    }
-  };
-
-  const handleEnd = () => {
-    if (sigCanvas.current) {
-      // Kiểm tra nếu canvas có chữ ký
-      if (!sigCanvas.current.isEmpty()) {
-        setIsSigned(true);
-      } else {
-        setIsSigned(false);
-      }
-    }
   };
 
   return (
@@ -96,6 +126,7 @@ export default function SignaturePage() {
             labelCol={{ span: 4 }}
             size="large"
             style={{ marginTop: "20px" }}
+            onFinish={saveSignature}
           >
             <Form.Item
               label={
@@ -103,8 +134,10 @@ export default function SignaturePage() {
                   Signature
                 </span>
               }
+              name="signature"
+              rules={[{ required: true, message: "Please input signature!" }]}
             >
-              <SignatureCanvas
+              {/* <SignatureCanvas
                 ref={sigCanvas}
                 backgroundColor="white"
                 penColor="black"
@@ -122,7 +155,8 @@ export default function SignaturePage() {
                 type="default"
               >
                 Clear Signature
-              </Button>
+              </Button> */}
+              <Input />
             </Form.Item>
 
             <Form.Item
@@ -138,20 +172,13 @@ export default function SignaturePage() {
             <Form.Item className={styles.center_buttons}>
               <Space>
                 <Button
-                  onClick={saveSignature}
-                  disabled={!isSigned}
+                  htmlType="submit"
+                  // onClick={saveSignature}
+                  // disabled={!isSigned}
                   className={styles.btn}
                   loading={isLoading}
                 >
-                  Complete
-                </Button>
-                <Button
-                  onClick={saveSignature}
-                  disabled={!isSigned}
-                  className={styles.btn}
-                  loading={isLoading}
-                >
-                  Save
+                  Submit
                 </Button>
               </Space>
             </Form.Item>
