@@ -100,16 +100,22 @@ export async function GET() {
   });
   const answerLesion = answerLesions.map((i) => {
     const data = {};
-    set(data, "eval1.type", get(i, "0", ""));
-    set(data, `eval1.${get(i, "0", "")}ConfidenceLevel`, get(i, "1", ""));
-    set(data, `eval1.${get(i, "0", "")}LesionType`, get(i, "2", ""));
-    set(data, `eval1.done`, get(i, "3", ""));
-    set(data, "eval2.type", get(i, "4", ""));
-    set(data, `eval2.${get(i, "4", "")}ConfidenceLevel`, get(i, "5", ""));
-    set(data, `eval2.${get(i, "4", "")}LesionType`, get(i, "6", ""));
-    set(data, `eval2.affectDiagnostic`, get(i, "7", ""));
-    set(data, `eval2.affectConfidenceLevel`, get(i, "8", ""));
-    set(data, `eval2.done`, get(i, "9", ""));
+    //lesion 1 done
+    if ((get(i, "3", "") as string) == "True") {
+      set(data, "type", get(i, "4", ""));
+      set(data, `${get(i, "4", "")}ConfidenceLevel`, get(i, "5", ""));
+      set(data, `${get(i, "4", "")}LesionType`, get(i, "6", ""));
+      set(data, `affectDiagnostic`, get(i, "7", ""));
+      set(data, `affectConfidenceLevel`, get(i, "8", ""));
+      set(data, "currentEval", 2);
+    } else {
+      set(data, "type", get(i, "0", ""));
+      set(data, `${get(i, "0", "")}ConfidenceLevel`, get(i, "1", ""));
+      set(data, `${get(i, "0", "")}LesionType`, get(i, "2", ""));
+      set(data, `done`, get(i, "3", ""));
+      set(data, "currentEval", 1);
+    }
+
     return data;
   })?.[0];
 

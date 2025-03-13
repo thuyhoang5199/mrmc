@@ -25,6 +25,7 @@ import { useRouter } from "next/navigation";
 import LoadingPage from "../component/LoadingPage";
 import { axiosInstance } from "../axios-instance";
 import { logout } from "../functions/logout";
+import { omit } from "lodash";
 
 const marksBenign: SliderSingleProps["marks"] = {
   1: {
@@ -142,13 +143,6 @@ const malignantLesions = [
   },
 ];
 
-// Define the type of currentData
-interface CurrentData {
-  eval: number;
-  eval1: unknown; // eval1 as an object or null
-  eval2: unknown; // eval2 as an object or null
-}
-
 export default function EvaluationForm() {
   const router = useRouter();
   const [form] = Form.useForm();
@@ -158,6 +152,12 @@ export default function EvaluationForm() {
 
   const [seconds, setSeconds] = useState(0);
   const [startTime, setStartTime] = useState<string | undefined>(undefined);
+  const [currentEval, setCurrentEval] = useState(1);
+
+  //#region for handle not working util 5 minutes
+  const [lastActionTime, setLastActionTime] = useState(Date.now());
+  const [isApiCalled, setIsApiCalled] = useState(false);
+  //#endregion
 
   const [isLogoutOpen, setIsLogoutOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
@@ -179,29 +179,6 @@ export default function EvaluationForm() {
     },
   });
 
-  const [currentData, setCurrentData] = useState<CurrentData>({
-    eval: 1,
-    eval1: null, // Default object for eval1
-    eval2: null, // Default object for eval2
-  });
-
-  // Fetch data from localStorage when the component mounts
-  useEffect(() => {
-    if (typeof window !== "undefined") {
-      const storedData = localStorage.getItem("currentData");
-      if (storedData) {
-        setCurrentData(JSON.parse(storedData));
-      }
-    }
-  }, []); // This will run only once after the component mounts
-
-  // Sync the currentData with localStorage whenever it changes
-  useEffect(() => {
-    if (typeof window !== "undefined") {
-      localStorage.setItem("currentData", JSON.stringify(currentData));
-    }
-  }, [currentData]); // This will run whenever currentData changes
-
   useEffect(() => {
     setIsLoading(true);
     axiosInstance(router)
@@ -215,7 +192,9 @@ export default function EvaluationForm() {
             router.replace("/result");
           }
         } else {
-          setQuestionInfo(res.data);
+          setQuestionInfo(omit(res.data, ["answerLesion"]) as any);
+          setCurrentEval(Number(res.data?.answerLesion?.currentEval || 1));
+          form.setFieldsValue(omit(res.data?.answerLesion, ["currentEval"]));
         }
       })
       .catch(async (e) => {
@@ -231,39 +210,33 @@ export default function EvaluationForm() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const onSubmit = (values: unknown) => {
-    if (currentData.eval === 1) {
-      setCurrentData({
-        ...currentData,
-        eval: 2,
-        eval1: values,
+  const onSubmit = (values: any) => {
+    if (currentEval == 1) {
+      onFinish({
+        eval1: { ...values, done: "True" },
+        resetForm: true,
       });
-      success();
-      form.resetFields();
     } else {
       onFinish({
-        eval1: currentData.eval1,
-        eval2: values,
-      });
-      setCurrentData({
-        eval: 1,
-        eval1: null, // Default object for eval1
-        eval2: null, // Default object for eval2
+        eval2: { ...values, done: "True" },
+        resetForm: true,
       });
     }
   };
 
-  const onFinish = (values: object) => {
+  const onFinish = (values: any) => {
+    const { resetForm } = values;
     setIsLoading(true);
     axiosInstance(router)
       .post("/api/question", { ...values, startTime })
       .then((res) => {
         if (res.data?.successAll) {
           router.replace("/signature");
-        } else {
+        } else if (resetForm) {
           setQuestionInfo(res.data);
+          setCurrentEval(currentEval == 1 ? 2 : 1);
+          form.resetFields();
         }
-        form.resetFields();
         success();
       })
       .catch(async (e) => {
@@ -306,15 +279,19 @@ export default function EvaluationForm() {
   };
 
   const handleClickSave = () => {
-    messageApi.open({
-      type: "success",
-      content: "Your evaluation process has been saved successfully.",
-      style: {
-        fontSize: "20px",
-        color: "#0d7535",
-        fontWeight: 600,
-      },
-    });
+    const data = form.getFieldsValue();
+
+    if (currentEval == 1) {
+      onFinish({
+        eval1: { ...data, done: "False" },
+        resetForm: false,
+      });
+    } else {
+      onFinish({
+        eval2: { ...data, done: "False" },
+        resetForm: false,
+      });
+    }
   };
 
   const submitLogout = () => {
@@ -335,6 +312,51 @@ export default function EvaluationForm() {
       remainingSeconds
     ).padStart(2, "0")}`;
   };
+
+  //#region for handle not working util 5 minutes
+  const handleUserActivity = () => {
+    setLastActionTime(Date.now());
+    if (isApiCalled) {
+      setIsApiCalled(false); // Reset cờ khi có hành động mới
+    }
+  };
+
+  useEffect(() => {
+    // Đăng ký sự kiện cho hành động của người dùng
+    window.addEventListener("mousemove", handleUserActivity);
+    window.addEventListener("keydown", handleUserActivity);
+    window.addEventListener("scroll", handleUserActivity);
+
+    const interval = setInterval(() => {
+      // Kiểm tra nếu 5 phút đã trôi qua và API chưa được gọi
+      if (Date.now() - lastActionTime > 1 * 60 * 1000 && !isApiCalled) {
+        setIsApiCalled(true);
+        const data = form.getFieldsValue();
+        if (currentEval == 1) {
+          onFinish({
+            eval1: { ...data, done: "False" },
+            resetForm: false,
+          });
+          success();
+        } else {
+          onFinish({
+            eval2: { ...data, done: "False" },
+            resetForm: false,
+          });
+        }
+      }
+    }, 10000); // Kiểm tra mỗi 10 giây
+
+    // Dọn dẹp sự kiện khi component bị unmount
+    return () => {
+      window.removeEventListener("mousemove", handleUserActivity);
+      window.removeEventListener("keydown", handleUserActivity);
+      window.removeEventListener("scroll", handleUserActivity);
+      clearInterval(interval);
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [lastActionTime, isApiCalled]);
+  //#endregion
 
   return (
     <div className={styles.page}>
@@ -414,7 +436,7 @@ export default function EvaluationForm() {
           <Typography className={styles.img_gr}>
             {isLoading || !questionInfo.lesionAuraResultScreen ? (
               <Skeleton.Image active={true} />
-            ) : currentData.eval === 2 ? (
+            ) : currentEval === 2 ? (
               <Image
                 alt=""
                 src={`https://mrmc.vercel.app/${questionInfo.lesionAuraResultScreen}.jpg`}
@@ -526,7 +548,6 @@ export default function EvaluationForm() {
                     ]}
                     labelCol={{ span: 24 }}
                     wrapperCol={{ span: 24 }}
-                    valuePropName="select"
                     className={styles.form_item}
                   >
                     <Select
@@ -538,7 +559,7 @@ export default function EvaluationForm() {
                       size="large"
                     />
                   </Form.Item>
-                  {currentData.eval === 2 ? (
+                  {currentEval === 2 ? (
                     <>
                       <label className={styles.label_item}>
                         {" "}
@@ -647,7 +668,6 @@ export default function EvaluationForm() {
                     ]}
                     labelCol={{ span: 24 }}
                     wrapperCol={{ span: 24 }}
-                    valuePropName="select"
                     className={styles.form_item}
                   >
                     <Select
@@ -659,7 +679,7 @@ export default function EvaluationForm() {
                       size="large"
                     />
                   </Form.Item>
-                  {currentData.eval === 2 ? (
+                  {currentEval === 2 ? (
                     <>
                       <label className={styles.label_item}>
                         {" "}
