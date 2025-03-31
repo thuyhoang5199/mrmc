@@ -20,13 +20,13 @@ export async function POST(req: Request) {
     spreadsheetId: process.env.GOOGLE_DATA_SPREAD_SHEET_ID as string,
     data: [
       {
-        range: `Login_Manage!G${Number(accountFromToken.index) + 1}:G${
+        range: `Login_Manage!K${Number(accountFromToken.index) + 1}:K${
           Number(accountFromToken.index) + 1
         }`,
         values: [["False"]],
       },
       {
-        range: `Login_Manage!E${Number(accountFromToken.index) + 1}:E${
+        range: `Login_Manage!J${Number(accountFromToken.index) + 1}:J${
           Number(accountFromToken.index) + 1
         }`,
         values: [[newPassword]],

@@ -19,7 +19,7 @@ export async function POST(req: Request) {
   const { otp } = await req.json();
 
   const accounts = await getDataInRange({
-    range: `Login_Manage!G${Number(accountFromToken.index) + 1}:I${
+    range: `Login_Manage!A${Number(accountFromToken.index) + 1}:M${
       Number(accountFromToken.index) + 1
     }`,
     spreadsheetId: process.env.GOOGLE_DATA_SPREAD_SHEET_ID as string,
@@ -27,9 +27,9 @@ export async function POST(req: Request) {
 
   const accountFormatted = accounts.map((item) => {
     return {
-      isDefaultPassword: get(item, "0", "1"),
-      otp: get(item, "1", ""),
-      otpExpired: get(item, "2", ""),
+      isDefaultPassword: get(item, "10", "1"),
+      otp: get(item, "11", ""),
+      otpExpired: get(item, "12", ""),
     };
   });
   if (!accountFormatted || accountFormatted.length < 1) {

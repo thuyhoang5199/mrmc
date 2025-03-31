@@ -19,7 +19,7 @@ export async function POST() {
   const spreadsheetId = process.env.GOOGLE_DATA_SPREAD_SHEET_ID as string;
 
   const accounts = await getDataInRange({
-    range: `Login_Manage!A${Number(accountFromToken.index) + 1}:F${
+    range: `Login_Manage!A${Number(accountFromToken.index) + 1}:M${
       Number(accountFromToken.index) + 1
     }`,
     spreadsheetId: process.env.GOOGLE_DATA_SPREAD_SHEET_ID as string,
@@ -54,7 +54,7 @@ export async function POST() {
       spreadsheetId,
       data: [
         {
-          range: `Login_Manage!H${Number(accountFromToken.index) + 1}:I${
+          range: `Login_Manage!L${Number(accountFromToken.index) + 1}:M${
             Number(accountFromToken.index) + 1
           }`,
           values: [[hashPasscode, OTPExpired]],

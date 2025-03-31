@@ -103,7 +103,7 @@ export async function GET() {
   }
 
   const questions = await getDataInRange({
-    range: `Lesion_Info!A${nextQuestionIndex + 1}:H${nextQuestionIndex + 1}`,
+    range: `Lesion_Info!A${nextQuestionIndex + 1}:O${nextQuestionIndex + 1}`,
     spreadsheetId: process.env.GOOGLE_DATA_SPREAD_SHEET_ID as string,
   });
 
@@ -157,12 +157,12 @@ export async function GET() {
   const question = questions.map((item) => {
     return {
       lesionId: get(item, "1", ""),
-      patientAge: get(item, "2", 0),
-      patientGender: get(item, "3", ""),
-      lesionLocation: get(item, "4", ""),
-      lesionSize: get(item, "5", ""),
-      lesionPicture: get(item, "6", ""),
-      lesionAuraResultScreen: get(item, "7", ""),
+      patientAge: get(item, "6", 0),
+      patientGender: get(item, "4", ""),
+      lesionLocation: get(item, "5", ""),
+      lesionSize: get(item, "7", ""),
+      lesionPicture: get(item, "13", ""),
+      lesionAuraResultScreen: get(item, "14", ""),
       answerLesion: answerLesion || {},
     };
   });
@@ -321,7 +321,7 @@ export async function POST(req: NextRequest) {
     }
 
     const questions = await getDataInRange({
-      range: `Lesion_Info!A${Number(nextQuestionIndex) + 1}:H${
+      range: `Lesion_Info!A${Number(nextQuestionIndex) + 1}:O${
         Number(nextQuestionIndex) + 1
       }`,
       spreadsheetId: process.env.GOOGLE_DATA_SPREAD_SHEET_ID as string,
@@ -334,12 +334,12 @@ export async function POST(req: NextRequest) {
     const question = questions.map((item) => {
       return {
         lesionId: get(item, "1", ""),
-        patientAge: get(item, "2", 0),
-        patientGender: get(item, "3", ""),
-        lesionLocation: get(item, "4", ""),
-        lesionSize: get(item, "5", ""),
-        lesionPicture: get(item, "6", ""),
-        lesionAuraResultScreen: get(item, "7", ""),
+        patientAge: get(item, "6", 0),
+        patientGender: get(item, "4", ""),
+        lesionLocation: get(item, "5", ""),
+        lesionSize: get(item, "7", ""),
+        lesionPicture: get(item, "13", ""),
+        lesionAuraResultScreen: get(item, "14", ""),
       };
     });
 

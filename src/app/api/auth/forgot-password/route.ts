@@ -17,7 +17,7 @@ export async function POST(req: Request) {
   const spreadsheetId = process.env.GOOGLE_DATA_SPREAD_SHEET_ID as string;
 
   const accounts = await getDataInRange({
-    range: "Login_Manage!A:G",
+    range: "Login_Manage!A:M",
     spreadsheetId,
   });
 
@@ -27,11 +27,11 @@ export async function POST(req: Request) {
     return {
       index: get(item, "0", "1"),
       name: get(item, "1", ""),
-      id: get(item, "2", ""),
-      username: get(item, "3", ""),
-      password: get(item, "4", ""),
+      id: get(item, "7", ""),
+      username: get(item, "8", ""),
+      password: get(item, "9", ""),
       email: get(item, "5", ""),
-      isDefaultPassword: get(item, "6", ""),
+      isDefaultPassword: get(item, "10", ""),
     };
   });
   const account = accountFormatted.find((item) => item.username == username);
