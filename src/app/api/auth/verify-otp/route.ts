@@ -41,16 +41,19 @@ export async function POST(req: Request) {
 
   if (isOTPExpired) {
     return NextResponse.json(
-      { message: "OTP Expired, please resend again", isOTPExpired },
+      {
+        message: "Verification Code Expired, please resend again",
+        isOTPExpired,
+      },
       { status: 400 }
     );
   } else if (!isValidOTP) {
     return NextResponse.json(
-      { message: "OTP Invalid", isOTPExpired: false },
+      { message: "Verification Code Invalid", isOTPExpired: false },
       { status: 400 }
     );
   }
-  const expiredIn = 5 * 60 * 60;
+  const expiredIn = 15 * 60 * 60;
   return returnWithNewToken({
     account: accountFromToken,
     nextRouter:

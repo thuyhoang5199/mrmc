@@ -64,7 +64,7 @@ export default function OTPPage() {
       .post("/api/auth/resend-otp", {})
       .then(() => {
         api.success({
-          message: "Resend OTP Successful",
+          message: "Resend Verification Code Successful",
         });
       })
       .catch((error) => {
@@ -106,8 +106,8 @@ export default function OTPPage() {
             Verify your identity
           </Typography.Title>
           <p style={{ textAlign: "left" }}>
-            You are required to change the default password. Please enter OTP
-            code we sent you at {email}{" "}
+            You are required to change the default password. Please enter
+            Verification Code we sent you at {email}{" "}
           </p>
 
           <Typography style={{ textAlign: "left", marginBottom: 10 }}>
@@ -122,14 +122,17 @@ export default function OTPPage() {
               {isLoading ? "Resending..." : "Resend"}
             </Button>
           </Typography>
-          <label className={styles.label_otp}>Enter OTP</label>
+          <label className={styles.label_otp}>Enter Verification Code</label>
           <Form.Item<FieldType>
             name="otp"
             rules={[
-              { required: true, message: "Please input your otp!" },
+              {
+                required: true,
+                message: "Please input your Verification Code!",
+              },
               {
                 pattern: /^\d{6}$/,
-                message: "OTP must contain exactly 6 digits!",
+                message: "Verification Code must contain exactly 6 digits!",
               },
             ]}
             style={{ marginTop: 10 }}
