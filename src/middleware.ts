@@ -55,9 +55,9 @@ export default async function middleware(req: NextRequest) {
     return NextResponse.redirect(new URL(session.nextRouter, req.nextUrl));
   }
 
-  if (path == "/result") {
-    cookie.delete("session");
-  }
+  // if (path == "/result") {
+  //   cookie.delete("session");
+  // }
 
   return NextResponse.next();
 }
