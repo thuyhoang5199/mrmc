@@ -1,7 +1,6 @@
 import dayjs from "dayjs";
 import { cookies } from "next/headers";
 import { NextResponse } from "next/server";
-import { returnWithNewToken } from "../auth/return-with-new-token";
 import { validateAuthenticated } from "../auth/validate-authenticated";
 import { writeDataInRange } from "../utils/google";
 import timezone from "dayjs/plugin/timezone";
