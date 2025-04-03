@@ -3,6 +3,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { AntdRegistry } from "@ant-design/nextjs-registry";
 import { SpeedInsights } from "@vercel/speed-insights/next";
+import { Alert } from "antd";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -27,6 +28,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={`${geistSans.variable} ${geistMono.variable}`}>
+        <Alert message="This is DEMO page" type="warning" showIcon />
         <AntdRegistry>{children}</AntdRegistry>
         <SpeedInsights />
       </body>
