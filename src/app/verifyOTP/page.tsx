@@ -7,6 +7,7 @@ import { Button, Form, Typography } from "antd";
 import { useRouter } from "next/navigation";
 import { axiosInstance } from "../axios-instance";
 import { logout } from "../functions/logout";
+import { lowerCase } from "lodash";
 
 type FieldType = {
   otp?: string;
@@ -35,7 +36,7 @@ export default function OTPPage() {
         otp: values.otp,
       })
       .then((res) => {
-        if (res.data.isDefaultPassword == "True")
+        if (lowerCase(res.data.isDefaultPassword) == "true")
           router.replace("/changePassword");
         else router.replace("/evaluationForm");
       })

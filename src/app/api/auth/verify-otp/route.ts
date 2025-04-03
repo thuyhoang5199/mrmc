@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { get } from "lodash";
+import { get, lowerCase } from "lodash";
 import { cookies } from "next/headers";
 import { validateAuthenticated } from "../validate-authenticated";
 import { getDataInRange } from "../../utils/google";
@@ -57,7 +57,7 @@ export async function POST(req: Request) {
   return returnWithNewToken({
     account: accountFromToken,
     nextRouter:
-      account.isDefaultPassword == "True"
+      lowerCase(account.isDefaultPassword) == "true"
         ? "/changePassword"
         : "/evaluationForm",
     expiredIn,

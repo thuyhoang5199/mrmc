@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { getDataInRange, writeDataInRange } from "../utils/google";
-import { get } from "lodash";
+import { get, lowerCase } from "lodash";
 import { sendEmail } from "../utils/mail";
 import { encrypt } from "../utils/cipher";
 import dayjs from "dayjs";
@@ -45,7 +45,7 @@ export async function POST(req: Request) {
       { message: "Username incorrect" },
       { status: 401 }
     );
-  } else if (account.isDefaultPassword == "True") {
+  } else if (lowerCase(account.isDefaultPassword) == "true") {
     if (password != account.password) {
       return NextResponse.json(
         { message: "Password incorrect" },
