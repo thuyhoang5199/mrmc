@@ -1,4 +1,4 @@
-import { get, lowerCase, set } from "lodash";
+import { get, toLower, set } from "lodash";
 import { NextRequest, NextResponse } from "next/server";
 import { validateAuthenticated } from "../auth/validate-authenticated";
 import { getDataInRange, writeDataInRange } from "../utils/google";
@@ -131,7 +131,7 @@ export async function GET() {
   const answerLesion = answerLesions.map((i) => {
     const data = {};
     //lesion 1 done
-    if (lowerCase(get(i, "5", "") as string) == "true") {
+    if (toLower(get(i, "5", "") as string) == "true") {
       set(data, "type", get(i, "7", ""));
       set(data, `${get(i, "7", "")}ConfidenceLevel`, get(i, "8", ""));
       set(data, `${get(i, "7", "")}LesionType`, get(i, "9", ""));
@@ -247,7 +247,7 @@ export async function POST(req: NextRequest) {
     // ${diffMins != 0 ? diffMins + " minutes " : ""}
     // ${diffSecond != 0 ? diffSecond + " seconds " : ""}`;
     const dataWriteToRange = [];
-    if (lowerCase(eval2?.done) == "true") {
+    if (toLower(eval2?.done) == "true") {
       dataWriteToRange.push({
         values: [
           [
