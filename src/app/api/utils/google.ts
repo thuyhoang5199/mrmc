@@ -69,7 +69,7 @@ export async function writeDataInRange({
         data,
       });
     }
-    return [];
+    throw new Error("Cannot save data into database, please try again");
   }
 }
 

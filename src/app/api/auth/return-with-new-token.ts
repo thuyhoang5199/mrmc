@@ -13,7 +13,7 @@ export function returnWithNewToken({
     username: string;
     id: string;
     name: string;
-    index: string;
+    index: number;
     email: string;
   };
   nextRouter:

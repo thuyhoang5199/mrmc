@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { getDataInRange, writeDataInRange } from "../utils/google";
-import { get, lowerCase } from "lodash";
+import { get, toLower } from "lodash";
 import { sendEmail } from "../utils/mail";
 import { encrypt } from "../utils/cipher";
 import dayjs from "dayjs";
@@ -27,9 +27,9 @@ export async function POST(req: Request) {
 
   accounts.shift();
 
-  const accountFormatted = accounts.map((item) => {
+  const accountFormatted = accounts.map((item, index) => {
     return {
-      index: get(item, "0", "1"),
+      index: index + 1,
       name: get(item, "1", ""),
       id: get(item, "7", ""),
       username: get(item, "8", ""),
@@ -45,7 +45,7 @@ export async function POST(req: Request) {
       { message: "Username incorrect" },
       { status: 401 }
     );
-  } else if (lowerCase(account.isDefaultPassword) == "true") {
+  } else if (toLower(account.isDefaultPassword) == "true") {
     if (password != account.password) {
       return NextResponse.json(
         { message: "Password incorrect" },
