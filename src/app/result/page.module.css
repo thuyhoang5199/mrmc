@@ -1,5 +1,6 @@
 .page {
-  background-image: url("/public/bg-result.png");
+  background-color: rgba(249, 251, 251);
+  /* background-image: url("/public/bg-result.png"); */
   background-size: contain;
   background-position: center;
   background-attachment: fixed;
