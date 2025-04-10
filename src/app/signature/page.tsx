@@ -106,7 +106,7 @@ export default function SignaturePage() {
         {contextHolderNotificationSave}
         <Image
           alt="background"
-          src="bg.png"
+          src="/public/bg.png"
           preview={false}
           className={styles.img_header}
         />

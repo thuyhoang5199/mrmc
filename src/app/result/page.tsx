@@ -9,7 +9,7 @@ export default function ResultPage() {
     <div className={styles.page}>
       <div className={styles.container}>
         <Image
-          src="/reverse-logo-white.svg"
+          src="/public/reverse-logo-white.svg"
           preview={false}
           className={styles.img_style}
           alt="img"
@@ -19,9 +19,7 @@ export default function ResultPage() {
           You have completed the MRMC Study successfully. <br />
           Thank you for your support.
         </div>
-
       </div>
-
     </div>
   );
 }

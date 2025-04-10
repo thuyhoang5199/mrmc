@@ -18,7 +18,7 @@
       rgba(196, 234, 239, 0.95),
       rgba(255, 255, 255, 0.98)
     ),
-    url("/bg.png");
+    url("/public/bg.png");
   background-repeat: repeat-y;
   background-position: center;
 }
@@ -84,14 +84,14 @@
   font-weight: bold;
   width: 180px; /* Điều chỉnh kích thước cho phù hợp với hình ảnh */
   height: 180px;
-  background-image: url("/logoVita.png");
+  background-image: url("/public/logoVita.png");
   background-size: cover;
 }
 .title {
   margin-bottom: 30px !important;
   color: #063e5c !important ;
 }
-.btn_link{
+.btn_link {
   padding: unset !important;
 }
 .label_otp {
