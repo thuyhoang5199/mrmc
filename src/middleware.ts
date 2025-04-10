@@ -32,9 +32,10 @@ export default async function middleware(req: NextRequest) {
   }
 
   if (!token) {
-    if (isProtectedRoute)
+    if (isPublicRoute) return NextResponse.next();
+    else {
       return NextResponse.redirect(new URL("/", req.nextUrl));
-    else return NextResponse.next();
+    }
   }
 
   const session = jwt.decode(token as string) as JwtPayload;
@@ -48,6 +49,9 @@ export default async function middleware(req: NextRequest) {
   if (path === "undefined" || !session?.nextRouter) {
     cookie.delete("session");
     return NextResponse.redirect(new URL("/", req.nextUrl));
+  }
+  if (path.match("/((.*\\.png|.*\\.jpg$).*)")) {
+    return NextResponse.next();
   }
 
   // 5. Redirect to /dashboard if the user is authenticated
@@ -65,7 +69,7 @@ export default async function middleware(req: NextRequest) {
 // Routes Middleware should not run on
 export const config = {
   matcher: [
-    "/((?!api|_next/static|_next/image|.*\\.png|.*\\.jpg|.*\\.ico|.*\\.svg|.*\\.gif$).*)",
+    "/((?!api|_next/static|_next/image|.*\\.ico|.*\\.svg|public/.*|.*\\.gif$).*)",
   ],
   unstable_allowDynamic: ["**/node_modules/**"],
 };

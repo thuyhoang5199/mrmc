@@ -370,7 +370,7 @@ export default function EvaluationForm() {
       <div className={styles.container}>
         <Image
           alt="background"
-          src="bg.png"
+          src="/public/bg.png"
           preview={false}
           className={styles.img_header}
         />
@@ -446,7 +446,7 @@ export default function EvaluationForm() {
             ) : currentEval === 2 ? (
               <Image
                 alt=""
-                src={`https://mrmc.vercel.app/${questionInfo.lesionAuraResultScreen}.jpg`}
+                src={`${process.env.NEXT_PUBLIC_WEB_LINK}/lesion/${questionInfo.lesionAuraResultScreen}.jpg`}
                 className={styles.img}
                 preview={false}
               />
@@ -465,7 +465,7 @@ export default function EvaluationForm() {
             ) : (
               <Image
                 alt=""
-                src={`https://mrmc.vercel.app/${questionInfo.lesionPicture}.jpg`}
+                src={`${process.env.NEXT_PUBLIC_WEB_LINK}/lesion/${questionInfo.lesionPicture}.jpg`}
                 className={styles.img}
                 preview={false}
               />

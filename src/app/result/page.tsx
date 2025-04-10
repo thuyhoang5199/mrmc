@@ -15,18 +15,18 @@ export default function ResultPage() {
   useEffect(() => {
     const handleKeyPress = (event: KeyboardEvent) => {
       // Check if Ctrl (or Cmd on Mac) + I is pressed
-      if ((event.ctrlKey || event.metaKey) && event.key === 'i') {
+      if ((event.ctrlKey || event.metaKey) && event.key === "i") {
         event.preventDefault(); // Prevent the default behavior (like opening the browser's DevTools)
-        resetAccount()
+        resetAccount();
       }
     };
 
     // Add event listener when component mounts
-    document.addEventListener('keydown', handleKeyPress);
+    document.addEventListener("keydown", handleKeyPress);
 
     // Cleanup event listener when component unmounts
     return () => {
-      document.removeEventListener('keydown', handleKeyPress);
+      document.removeEventListener("keydown", handleKeyPress);
     };
   }, []);
 
@@ -64,7 +64,7 @@ export default function ResultPage() {
       .finally(() => {
         setIsLoading(false);
       });
-  }
+  };
   const submitLogout = () => {
     logout(router);
   };
@@ -74,7 +74,7 @@ export default function ResultPage() {
       <div className={styles.container}>
         {contextHolderNotificationSave}
         <Image
-          src="/reverse-logo-white.svg"
+          src="/public/reverse-logo-white.svg"
           preview={false}
           className={styles.img_style}
           alt="img"
@@ -82,7 +82,15 @@ export default function ResultPage() {
         <div className={styles.title}>
           Congratulations! <br />
           You have completed the MRMC Study successfully. <br />
-          Thank you for <a onClick={() => { resetAccount() }}>your</a> support.
+          Thank you for{" "}
+          <a
+            onClick={() => {
+              resetAccount();
+            }}
+          >
+            your
+          </a>{" "}
+          support.
         </div>
         <Space>
           <Button
