@@ -25,8 +25,8 @@ export default function Home() {
         username: values.username,
         password: values.password,
       })
-      .then(() => {
-        router.replace("/verifyOTP");
+      .then((res) => {
+        if (res.data?.nextRouter) router.replace(res.data.nextRouter);
       })
       .catch((error) => {
         form.setFields([
@@ -94,7 +94,9 @@ export default function Home() {
           >
             {isLoading ? "Signing In..." : "SIGN IN"}
           </Button>
-          <Link type="link" href={'forgotPassword'}>Forgot Password</Link>
+          <Link type="link" href={"forgotPassword"}>
+            Forgot Password
+          </Link>
         </Form>
       </main>
     </div>

@@ -102,7 +102,7 @@ export async function POST(req: Request) {
     ]);
 
     return NextResponse.json(
-      { token },
+      { token, nextRouter: "/verifyOTP" },
       {
         status: 200,
         headers: { "Set-Cookie": cookie },
@@ -120,7 +120,9 @@ export async function POST(req: Request) {
     return returnWithNewToken({
       account,
       nextRouter: "/evaluationForm",
-      responseData: {},
+      responseData: {
+        nextRouter: "/evaluationForm",
+      },
     });
   }
 }
