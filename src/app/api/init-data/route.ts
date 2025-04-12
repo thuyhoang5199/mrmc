@@ -60,7 +60,7 @@ export async function POST(req: NextRequest) {
 
   //#region generate lesion answer overview
   const sheetLoginManager = await getDataInRange({
-    range: "Login_Manage!A:C",
+    range: "Login_Manage!A:H",
     spreadsheetId,
   });
 
@@ -82,7 +82,7 @@ export async function POST(req: NextRequest) {
       listLesion = listLesion.sort(() => Math.random() - 0.5);
       const nextQuestionIndex = listLesion[0];
       return [
-        get(item, "2", ""),
+        get(item, "7", ""),
         listLesion.join("|"),
         nextQuestionIndex.toString(),
         "0",
