@@ -302,6 +302,18 @@ export default function EvaluationForm() {
   };
 
   const submitLogout = () => {
+    const data = form.getFieldsValue();
+    if (currentEval == 1) {
+      onFinish({
+        eval1: { ...data, done: "False" },
+        resetForm: false,
+      });
+    } else {
+      onFinish({
+        eval2: { ...data, done: "False" },
+        resetForm: false,
+      });
+    }
     logout(router);
   };
 
@@ -336,7 +348,7 @@ export default function EvaluationForm() {
 
     const interval = setInterval(() => {
       // Kiểm tra nếu 5 phút đã trôi qua và API chưa được gọi
-      if (Date.now() - lastActionTime > 5 * 60 * 1000 && !isApiCalled) {
+      if (Date.now() - lastActionTime > 60 * 1000 && !isApiCalled) {
         setIsApiCalled(true);
         const data = form.getFieldsValue();
         if (currentEval == 1) {
@@ -352,7 +364,7 @@ export default function EvaluationForm() {
           });
         }
       }
-    }, 10000); // Kiểm tra mỗi 10 giây
+    }, 1000); // Kiểm tra mỗi 1 giây
 
     // Dọn dẹp sự kiện khi component bị unmount
     return () => {
