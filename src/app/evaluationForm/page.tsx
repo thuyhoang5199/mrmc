@@ -245,7 +245,7 @@ export default function EvaluationForm() {
           setCurrentEval(currentEval == 1 ? 2 : 1);
           form.resetFields();
         }
-        success();
+        if (!values.ignoreNotification) success();
       })
       .catch(async (e) => {
         api.success({
@@ -355,12 +355,14 @@ export default function EvaluationForm() {
           onFinish({
             eval1: { ...data, done: "False" },
             resetForm: false,
+            ignoreNotification: true,
           });
           // success();
         } else {
           onFinish({
             eval2: { ...data, done: "False" },
             resetForm: false,
+            ignoreNotification: true,
           });
         }
       }
