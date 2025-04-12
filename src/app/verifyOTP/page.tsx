@@ -160,7 +160,7 @@ export default function OTPPage() {
           <p style={{ marginTop: 20 }}>
             If you can&apos;t find the verification code, please retry sign in
             or contact our{" "}
-            <a href="mailto:Info@vita-imaging.com">Support center</a>
+            <a href="mailto:MRMCSupport@vita-imaging.com">Support center</a>
           </p>
         </Form>
       </main>
